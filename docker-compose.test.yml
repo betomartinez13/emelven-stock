@@ -1,0 +1,11 @@
+services:
+  db_test:
+    image: mysql:8
+    container_name: emelven_db_test
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: emelven_test
+    tmpfs:
+      - /var/lib/mysql

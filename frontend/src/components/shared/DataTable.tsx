@@ -19,7 +19,7 @@ interface DataTableProps<T> {
 
 const PAGE_SIZE = 10;
 
-export default function DataTable<T extends Record<string, unknown>>({
+export default function DataTable<T extends object>({
   columns,
   data,
   total,

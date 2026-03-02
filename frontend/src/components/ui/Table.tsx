@@ -13,7 +13,7 @@ interface TableProps<T> {
   emptyMessage?: string;
 }
 
-export default function Table<T extends Record<string, unknown>>({
+export default function Table<T extends object>({
   columns,
   data,
   isLoading = false,

@@ -2,9 +2,11 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import ProtectedRoute from './components/shared/ProtectedRoute';
+import RoleGate from './components/shared/RoleGate';
 import MainLayout from './components/layout/MainLayout';
 import LoginPage from './pages/auth/LoginPage';
 import DashboardPage from './pages/dashboard/DashboardPage';
+import UsersListPage from './pages/users/UsersListPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -25,6 +27,14 @@ function App() {
           <Route element={<ProtectedRoute />}>
             <Route element={<MainLayout />}>
               <Route path="/dashboard" element={<DashboardPage />} />
+              <Route
+                path="/users"
+                element={
+                  <RoleGate roles={['admin']} fallback={<Navigate to="/dashboard" replace />}>
+                    <UsersListPage />
+                  </RoleGate>
+                }
+              />
             </Route>
           </Route>
           <Route path="*" element={<Navigate to="/dashboard" replace />} />

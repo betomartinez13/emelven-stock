@@ -7,6 +7,9 @@ import MainLayout from './components/layout/MainLayout';
 import LoginPage from './pages/auth/LoginPage';
 import DashboardPage from './pages/dashboard/DashboardPage';
 import UsersListPage from './pages/users/UsersListPage';
+import CategoriesPage from './pages/categories/CategoriesPage';
+import SuppliersListPage from './pages/suppliers/SuppliersListPage';
+import SupplierFormPage from './pages/suppliers/SupplierFormPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -35,6 +38,10 @@ function App() {
                   </RoleGate>
                 }
               />
+              <Route path="/categories" element={<CategoriesPage />} />
+              <Route path="/suppliers" element={<SuppliersListPage />} />
+              <Route path="/suppliers/new" element={<SupplierFormPage />} />
+              <Route path="/suppliers/:id/edit" element={<SupplierFormPage />} />
             </Route>
           </Route>
           <Route path="*" element={<Navigate to="/dashboard" replace />} />

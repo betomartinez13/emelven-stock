@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, Query, UseGuards, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, Query, UseGuards, UseInterceptors, ParseIntPipe } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { SuppliersService } from './suppliers.service';
 import { CreateSupplierDto } from './dto/create-supplier.dto';
@@ -7,11 +7,15 @@ import { PaginationDto } from '../../common/dto/pagination.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
+import { AuditEntity } from '../../common/decorators/audit-entity.decorator';
+import { AuditInterceptor } from '../../common/interceptors/audit.interceptor';
 import { UserRole } from '../users/entities/user.entity';
 
 @ApiTags('suppliers')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
+@AuditEntity('Supplier')
+@UseInterceptors(AuditInterceptor)
 @Controller('suppliers')
 export class SuppliersController {
   constructor(private suppliersService: SuppliersService) {}

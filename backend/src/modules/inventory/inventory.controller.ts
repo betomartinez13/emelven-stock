@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Query, UseGuards, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Query, UseGuards, UseInterceptors, ParseIntPipe } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { InventoryService } from './inventory.service';
 import { CreateEntryDto } from './dto/create-entry.dto';
@@ -8,12 +8,16 @@ import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { AuditEntity } from '../../common/decorators/audit-entity.decorator';
+import { AuditInterceptor } from '../../common/interceptors/audit.interceptor';
 import { UserRole } from '../users/entities/user.entity';
 import { User } from '../users/entities/user.entity';
 
 @ApiTags('inventory')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
+@AuditEntity('Inventory')
+@UseInterceptors(AuditInterceptor)
 @Controller('inventory')
 export class InventoryController {
   constructor(private inventoryService: InventoryService) {}

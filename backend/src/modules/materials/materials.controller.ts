@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, Query, UseGuards, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, Query, UseGuards, UseInterceptors, ParseIntPipe } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { MaterialsService } from './materials.service';
 import { CreateMaterialDto } from './dto/create-material.dto';
@@ -7,11 +7,15 @@ import { MaterialFilterDto } from './dto/material-filter.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
+import { AuditEntity } from '../../common/decorators/audit-entity.decorator';
+import { AuditInterceptor } from '../../common/interceptors/audit.interceptor';
 import { UserRole } from '../users/entities/user.entity';
 
 @ApiTags('materials')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
+@AuditEntity('Material')
+@UseInterceptors(AuditInterceptor)
 @Controller('materials')
 export class MaterialsController {
   constructor(private materialsService: MaterialsService) {}

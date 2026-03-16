@@ -13,7 +13,7 @@ import { InventoryExit } from '../src/modules/inventory/entities/inventory-exit.
 import { AuditLog } from '../src/modules/audit-log/entities/audit-log.entity';
 import { DataSource, Repository } from 'typeorm';
 
-describe('Materials (e2e)', () => {
+describe('Audit Log (e2e)', () => {
   let app: INestApplication;
   let dataSource: DataSource;
   let userRepo: Repository<User>;
@@ -26,8 +26,7 @@ describe('Materials (e2e)', () => {
   let adminToken: string;
   let warehouseToken: string;
   let categoryId: number;
-  let supplierId: number;
-  let createdMaterialId: number;
+  let materialId: number;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -73,9 +72,6 @@ describe('Materials (e2e)', () => {
     const catInsert = await categoryRepo.insert({ nombre: 'Conductores', descripcion: 'Test' });
     categoryId = catInsert.identifiers[0].id;
 
-    const supInsert = await supplierRepo.insert({ nombre: 'Proveedor Test' });
-    supplierId = supInsert.identifiers[0].id;
-
     const adminLogin = await request(app.getHttpServer())
       .post('/api/auth/login').send({ email: 'admin@test.com', password: 'password123' });
     adminToken = adminLogin.body.access_token;
@@ -98,144 +94,93 @@ describe('Materials (e2e)', () => {
     await app.close();
   });
 
-  describe('POST /api/materials', () => {
-    it('admin can create a material', async () => {
+  describe('Audit trail via Material operations', () => {
+    it('POST /api/materials creates CREATE audit entry', async () => {
       const res = await request(app.getHttpServer())
         .post('/api/materials')
         .set('Authorization', `Bearer ${adminToken}`)
-        .send({ nombre: 'Cable de cobre', unidad: 'm', stockActual: 500, stockMin: 100, stockMax: 1000, categoryId })
+        .send({ nombre: 'Cable de cobre', unidad: 'm', stockActual: 100, stockMin: 20, categoryId })
         .expect(201);
 
-      expect(res.body.nombre).toBe('Cable de cobre');
-      expect(res.body.categoryId).toBe(categoryId);
-      createdMaterialId = res.body.id;
-    });
+      materialId = res.body.id;
 
-    it('warehouse can create a material', async () => {
-      const res = await request(app.getHttpServer())
-        .post('/api/materials')
-        .set('Authorization', `Bearer ${warehouseToken}`)
-        .send({ nombre: 'Tornillos M8', unidad: 'unidad', stockActual: 200, stockMin: 50, categoryId })
-        .expect(201);
+      // Small delay to allow async audit log to persist
+      await new Promise((r) => setTimeout(r, 50));
 
-      expect(res.body.nombre).toBe('Tornillos M8');
-      await materialRepo.delete(res.body.id);
-    });
-
-    it('returns 401 without token', () => {
-      return request(app.getHttpServer())
-        .post('/api/materials')
-        .send({ nombre: 'Hack', unidad: 'm', categoryId })
-        .expect(401);
-    });
-
-    it('returns 404 for invalid categoryId', () => {
-      return request(app.getHttpServer())
-        .post('/api/materials')
-        .set('Authorization', `Bearer ${adminToken}`)
-        .send({ nombre: 'Test Material', unidad: 'm', categoryId: 9999 })
-        .expect(404);
-    });
-  });
-
-  describe('GET /api/materials', () => {
-    it('returns paginated list', async () => {
-      const res = await request(app.getHttpServer())
-        .get('/api/materials')
+      const auditRes = await request(app.getHttpServer())
+        .get('/api/audit-log?entidad=Material&accion=CREATE')
         .set('Authorization', `Bearer ${adminToken}`)
         .expect(200);
 
-      expect(res.body.data).toBeDefined();
-      expect(res.body.total).toBeGreaterThanOrEqual(1);
+      expect(auditRes.body.total).toBeGreaterThanOrEqual(1);
+      expect(auditRes.body.data[0].accion).toBe('CREATE');
+      expect(auditRes.body.data[0].entidad).toBe('Material');
     });
 
-    it('filters by categoryId', async () => {
-      const res = await request(app.getHttpServer())
-        .get(`/api/materials?categoryId=${categoryId}`)
-        .set('Authorization', `Bearer ${adminToken}`)
-        .expect(200);
-
-      expect(res.body.data.every((m: any) => m.categoryId === categoryId)).toBe(true);
-    });
-
-    it('pagination works', async () => {
-      const res = await request(app.getHttpServer())
-        .get('/api/materials?page=1&limit=1')
-        .set('Authorization', `Bearer ${adminToken}`)
-        .expect(200);
-
-      expect(res.body.data).toHaveLength(1);
-      expect(res.body.limit).toBe(1);
-    });
-  });
-
-  describe('GET /api/materials/low-stock', () => {
-    it('returns materials below stockMin', async () => {
-      const res = await request(app.getHttpServer())
-        .get('/api/materials/low-stock')
-        .set('Authorization', `Bearer ${adminToken}`)
-        .expect(200);
-
-      expect(Array.isArray(res.body)).toBe(true);
-    });
-  });
-
-  describe('GET /api/materials/:id', () => {
-    it('returns material by ID with category relation', async () => {
-      const res = await request(app.getHttpServer())
-        .get(`/api/materials/${createdMaterialId}`)
-        .set('Authorization', `Bearer ${adminToken}`)
-        .expect(200);
-
-      expect(res.body.id).toBe(createdMaterialId);
-      expect(res.body.category).toBeDefined();
-    });
-  });
-
-  describe('PATCH /api/materials/:id', () => {
-    it('admin can update a material', async () => {
-      const res = await request(app.getHttpServer())
-        .patch(`/api/materials/${createdMaterialId}`)
+    it('PATCH /api/materials/:id creates UPDATE audit entry', async () => {
+      await request(app.getHttpServer())
+        .patch(`/api/materials/${materialId}`)
         .set('Authorization', `Bearer ${adminToken}`)
         .send({ nombre: 'Cable actualizado' })
         .expect(200);
 
-      expect(res.body.nombre).toBe('Cable actualizado');
+      await new Promise((r) => setTimeout(r, 50));
+
+      const auditRes = await request(app.getHttpServer())
+        .get('/api/audit-log?entidad=Material&accion=UPDATE')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .expect(200);
+
+      expect(auditRes.body.total).toBeGreaterThanOrEqual(1);
+      expect(auditRes.body.data[0].accion).toBe('UPDATE');
     });
 
-    it('warehouse can update a material', () => {
+    it('DELETE /api/materials/:id creates DELETE audit entry', async () => {
+      await request(app.getHttpServer())
+        .delete(`/api/materials/${materialId}`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .expect(200);
+
+      await new Promise((r) => setTimeout(r, 50));
+
+      const auditRes = await request(app.getHttpServer())
+        .get('/api/audit-log?entidad=Material&accion=DELETE')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .expect(200);
+
+      expect(auditRes.body.total).toBeGreaterThanOrEqual(1);
+      expect(auditRes.body.data[0].accion).toBe('DELETE');
+    });
+  });
+
+  describe('GET /api/audit-log', () => {
+    it('returns 200 for admin', () => {
       return request(app.getHttpServer())
-        .patch(`/api/materials/${createdMaterialId}`)
-        .set('Authorization', `Bearer ${warehouseToken}`)
-        .send({ stockMin: 150 })
+        .get('/api/audit-log')
+        .set('Authorization', `Bearer ${adminToken}`)
         .expect(200);
     });
-  });
 
-  describe('DELETE /api/materials/:id — ConflictException check on category', () => {
-    it('cannot delete category that has linked materials (409)', () => {
+    it('returns 403 for warehouse (non-admin)', () => {
       return request(app.getHttpServer())
-        .delete(`/api/categories/${categoryId}`)
-        .set('Authorization', `Bearer ${adminToken}`)
-        .expect(409);
-    });
-  });
-
-  describe('DELETE /api/materials/:id', () => {
-    it('warehouse cannot delete a material (403)', () => {
-      return request(app.getHttpServer())
-        .delete(`/api/materials/${createdMaterialId}`)
+        .get('/api/audit-log')
         .set('Authorization', `Bearer ${warehouseToken}`)
         .expect(403);
     });
 
-    it('admin can delete a material', async () => {
+    it('returns 401 without token', () => {
+      return request(app.getHttpServer())
+        .get('/api/audit-log')
+        .expect(401);
+    });
+
+    it('filters by entidad=Material returns only material records', async () => {
       const res = await request(app.getHttpServer())
-        .delete(`/api/materials/${createdMaterialId}`)
+        .get('/api/audit-log?entidad=Material')
         .set('Authorization', `Bearer ${adminToken}`)
         .expect(200);
 
-      expect(res.body.message).toBeDefined();
+      expect(res.body.data.every((r: any) => r.entidad === 'Material')).toBe(true);
     });
   });
 });

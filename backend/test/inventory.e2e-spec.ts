@@ -10,16 +10,19 @@ import { Supplier } from '../src/modules/suppliers/entities/supplier.entity';
 import { Material } from '../src/modules/materials/entities/material.entity';
 import { InventoryEntry } from '../src/modules/inventory/entities/inventory-entry.entity';
 import { InventoryExit } from '../src/modules/inventory/entities/inventory-exit.entity';
-import { Repository } from 'typeorm';
+import { AuditLog } from '../src/modules/audit-log/entities/audit-log.entity';
+import { DataSource, Repository } from 'typeorm';
 
 describe('Inventory (e2e)', () => {
   let app: INestApplication;
+  let dataSource: DataSource;
   let userRepo: Repository<User>;
   let categoryRepo: Repository<Category>;
   let supplierRepo: Repository<Supplier>;
   let materialRepo: Repository<Material>;
   let entryRepo: Repository<InventoryEntry>;
   let exitRepo: Repository<InventoryExit>;
+  let auditRepo: Repository<AuditLog>;
   let adminToken: string;
   let warehouseToken: string;
   let materialId: number;
@@ -40,14 +43,19 @@ describe('Inventory (e2e)', () => {
     materialRepo = moduleFixture.get<Repository<Material>>(getRepositoryToken(Material));
     entryRepo = moduleFixture.get<Repository<InventoryEntry>>(getRepositoryToken(InventoryEntry));
     exitRepo = moduleFixture.get<Repository<InventoryExit>>(getRepositoryToken(InventoryExit));
+    auditRepo = moduleFixture.get<Repository<AuditLog>>(getRepositoryToken(AuditLog));
+    dataSource = moduleFixture.get(DataSource);
 
-    // FK-safe cleanup: children before parents
+    // FK-safe cleanup (FK checks disabled to handle async audit saves race condition)
+    await dataSource.query('SET FOREIGN_KEY_CHECKS = 0');
+    await auditRepo.createQueryBuilder().delete().execute();
     await exitRepo.createQueryBuilder().delete().execute();
     await entryRepo.createQueryBuilder().delete().execute();
     await materialRepo.createQueryBuilder().delete().execute();
     await supplierRepo.createQueryBuilder().delete().execute();
     await categoryRepo.createQueryBuilder().delete().execute();
     await userRepo.createQueryBuilder().delete().execute();
+    await dataSource.query('SET FOREIGN_KEY_CHECKS = 1');
 
     const hashedPassword = await bcrypt.hash('password123', 10);
 
@@ -83,12 +91,15 @@ describe('Inventory (e2e)', () => {
   });
 
   afterAll(async () => {
+    await dataSource.query('SET FOREIGN_KEY_CHECKS = 0');
+    await auditRepo.createQueryBuilder().delete().execute();
     await exitRepo.createQueryBuilder().delete().execute();
     await entryRepo.createQueryBuilder().delete().execute();
     await materialRepo.createQueryBuilder().delete().execute();
     await supplierRepo.createQueryBuilder().delete().execute();
     await categoryRepo.createQueryBuilder().delete().execute();
     await userRepo.createQueryBuilder().delete().execute();
+    await dataSource.query('SET FOREIGN_KEY_CHECKS = 1');
     await app.close();
   });
 

@@ -5,11 +5,15 @@ import * as bcrypt from 'bcrypt';
 import { AppModule } from '../src/app.module';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { User, UserRole } from '../src/modules/users/entities/user.entity';
+import { InventoryEntry } from '../src/modules/inventory/entities/inventory-entry.entity';
+import { InventoryExit } from '../src/modules/inventory/entities/inventory-exit.entity';
 import { Repository } from 'typeorm';
 
 describe('Users (e2e)', () => {
   let app: INestApplication;
   let userRepo: Repository<User>;
+  let entryRepo: Repository<InventoryEntry>;
+  let exitRepo: Repository<InventoryExit>;
   let adminToken: string;
   let warehouseToken: string;
   let testUserId: number;
@@ -25,9 +29,13 @@ describe('Users (e2e)', () => {
     await app.init();
 
     userRepo = moduleFixture.get<Repository<User>>(getRepositoryToken(User));
+    entryRepo = moduleFixture.get<Repository<InventoryEntry>>(getRepositoryToken(InventoryEntry));
+    exitRepo = moduleFixture.get<Repository<InventoryExit>>(getRepositoryToken(InventoryExit));
 
-    // Clean up and seed test users directly via insert() — bypasses @BeforeInsert so no double-hash
-    await userRepo.clear();
+    // Clean up in FK-safe order: inventory children before users
+    await exitRepo.createQueryBuilder().delete().execute();
+    await entryRepo.createQueryBuilder().delete().execute();
+    await userRepo.createQueryBuilder().delete().execute();
     const hashedPassword = await bcrypt.hash('password123', 10);
 
     await userRepo.insert({
@@ -54,7 +62,9 @@ describe('Users (e2e)', () => {
   });
 
   afterAll(async () => {
-    await userRepo.clear();
+    await exitRepo.createQueryBuilder().delete().execute();
+    await entryRepo.createQueryBuilder().delete().execute();
+    await userRepo.createQueryBuilder().delete().execute();
     await app.close();
   });
 

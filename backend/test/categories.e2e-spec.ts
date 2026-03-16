@@ -6,12 +6,18 @@ import { AppModule } from '../src/app.module';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { User, UserRole } from '../src/modules/users/entities/user.entity';
 import { Category } from '../src/modules/categories/entities/category.entity';
+import { Material } from '../src/modules/materials/entities/material.entity';
+import { InventoryEntry } from '../src/modules/inventory/entities/inventory-entry.entity';
+import { InventoryExit } from '../src/modules/inventory/entities/inventory-exit.entity';
 import { Repository } from 'typeorm';
 
 describe('Categories (e2e)', () => {
   let app: INestApplication;
   let userRepo: Repository<User>;
   let categoryRepo: Repository<Category>;
+  let materialRepo: Repository<Material>;
+  let entryRepo: Repository<InventoryEntry>;
+  let exitRepo: Repository<InventoryExit>;
   let adminToken: string;
   let warehouseToken: string;
   let createdCategoryId: number;
@@ -28,9 +34,16 @@ describe('Categories (e2e)', () => {
 
     userRepo = moduleFixture.get<Repository<User>>(getRepositoryToken(User));
     categoryRepo = moduleFixture.get<Repository<Category>>(getRepositoryToken(Category));
+    materialRepo = moduleFixture.get<Repository<Material>>(getRepositoryToken(Material));
+    entryRepo = moduleFixture.get<Repository<InventoryEntry>>(getRepositoryToken(InventoryEntry));
+    exitRepo = moduleFixture.get<Repository<InventoryExit>>(getRepositoryToken(InventoryExit));
 
-    await categoryRepo.clear();
-    await userRepo.clear();
+    // FK-safe cleanup: inventory → materials → categories → users
+    await exitRepo.createQueryBuilder().delete().execute();
+    await entryRepo.createQueryBuilder().delete().execute();
+    await materialRepo.createQueryBuilder().delete().execute();
+    await categoryRepo.createQueryBuilder().delete().execute();
+    await userRepo.createQueryBuilder().delete().execute();
 
     const hashedPassword = await bcrypt.hash('password123', 10);
 
@@ -55,8 +68,11 @@ describe('Categories (e2e)', () => {
   });
 
   afterAll(async () => {
-    await categoryRepo.clear();
-    await userRepo.clear();
+    await exitRepo.createQueryBuilder().delete().execute();
+    await entryRepo.createQueryBuilder().delete().execute();
+    await materialRepo.createQueryBuilder().delete().execute();
+    await categoryRepo.createQueryBuilder().delete().execute();
+    await userRepo.createQueryBuilder().delete().execute();
     await app.close();
   });
 

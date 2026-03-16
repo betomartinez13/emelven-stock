@@ -5,6 +5,8 @@ import { MaterialsService } from './materials.service';
 import { Material } from './entities/material.entity';
 import { Category } from '../categories/entities/category.entity';
 import { Supplier } from '../suppliers/entities/supplier.entity';
+import { InventoryEntry } from '../inventory/entities/inventory-entry.entity';
+import { InventoryExit } from '../inventory/entities/inventory-exit.entity';
 
 const mockMaterial = (overrides = {}): Material =>
   ({
@@ -50,6 +52,8 @@ describe('MaterialsService', () => {
         { provide: getRepositoryToken(Material), useFactory: mockRepo },
         { provide: getRepositoryToken(Category), useFactory: mockRepo },
         { provide: getRepositoryToken(Supplier), useFactory: mockRepo },
+        { provide: getRepositoryToken(InventoryEntry), useFactory: mockRepo },
+        { provide: getRepositoryToken(InventoryExit), useFactory: mockRepo },
       ],
     }).compile();
 

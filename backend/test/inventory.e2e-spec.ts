@@ -12,7 +12,7 @@ import { InventoryEntry } from '../src/modules/inventory/entities/inventory-entr
 import { InventoryExit } from '../src/modules/inventory/entities/inventory-exit.entity';
 import { Repository } from 'typeorm';
 
-describe('Materials (e2e)', () => {
+describe('Inventory (e2e)', () => {
   let app: INestApplication;
   let userRepo: Repository<User>;
   let categoryRepo: Repository<Category>;
@@ -22,9 +22,7 @@ describe('Materials (e2e)', () => {
   let exitRepo: Repository<InventoryExit>;
   let adminToken: string;
   let warehouseToken: string;
-  let categoryId: number;
-  let supplierId: number;
-  let createdMaterialId: number;
+  let materialId: number;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -43,7 +41,7 @@ describe('Materials (e2e)', () => {
     entryRepo = moduleFixture.get<Repository<InventoryEntry>>(getRepositoryToken(InventoryEntry));
     exitRepo = moduleFixture.get<Repository<InventoryExit>>(getRepositoryToken(InventoryExit));
 
-    // Delete in FK-safe order: inventory children before materials before parents
+    // FK-safe cleanup: children before parents
     await exitRepo.createQueryBuilder().delete().execute();
     await entryRepo.createQueryBuilder().delete().execute();
     await materialRepo.createQueryBuilder().delete().execute();
@@ -63,10 +61,17 @@ describe('Materials (e2e)', () => {
     });
 
     const catInsert = await categoryRepo.insert({ nombre: 'Conductores', descripcion: 'Test' });
-    categoryId = catInsert.identifiers[0].id;
+    const categoryId = catInsert.identifiers[0].id;
 
-    const supInsert = await supplierRepo.insert({ nombre: 'Proveedor Test' });
-    supplierId = supInsert.identifiers[0].id;
+    const matInsert = await materialRepo.insert({
+      nombre: 'Cable de cobre',
+      unidad: 'm',
+      stockActual: 100,
+      stockMin: 20,
+      stockMax: 500,
+      categoryId,
+    });
+    materialId = matInsert.identifiers[0].id;
 
     const adminLogin = await request(app.getHttpServer())
       .post('/api/auth/login').send({ email: 'admin@test.com', password: 'password123' });
@@ -87,50 +92,107 @@ describe('Materials (e2e)', () => {
     await app.close();
   });
 
-  describe('POST /api/materials', () => {
-    it('admin can create a material', async () => {
+  describe('POST /api/inventory/entries', () => {
+    it('admin can create entry — stock increases', async () => {
       const res = await request(app.getHttpServer())
-        .post('/api/materials')
+        .post('/api/inventory/entries')
         .set('Authorization', `Bearer ${adminToken}`)
-        .send({ nombre: 'Cable de cobre', unidad: 'm', stockActual: 500, stockMin: 100, stockMax: 1000, categoryId })
+        .send({ materialId, cantidad: 50 })
         .expect(201);
 
-      expect(res.body.nombre).toBe('Cable de cobre');
-      expect(res.body.categoryId).toBe(categoryId);
-      createdMaterialId = res.body.id;
+      expect(res.body.materialId).toBe(materialId);
+      expect(res.body.cantidad).toBe(50);
+
+      // Verify stock increased
+      const matRes = await request(app.getHttpServer())
+        .get(`/api/materials/${materialId}`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .expect(200);
+
+      expect(matRes.body.stockActual).toBe(150);
     });
 
-    it('warehouse can create a material', async () => {
+    it('warehouse can create entry', async () => {
       const res = await request(app.getHttpServer())
-        .post('/api/materials')
+        .post('/api/inventory/entries')
         .set('Authorization', `Bearer ${warehouseToken}`)
-        .send({ nombre: 'Tornillos M8', unidad: 'unidad', stockActual: 200, stockMin: 50, categoryId })
+        .send({ materialId, cantidad: 10, observacion: 'Reposición' })
         .expect(201);
 
-      expect(res.body.nombre).toBe('Tornillos M8');
-      await materialRepo.delete(res.body.id);
+      expect(res.body.cantidad).toBe(10);
     });
 
     it('returns 401 without token', () => {
       return request(app.getHttpServer())
-        .post('/api/materials')
-        .send({ nombre: 'Hack', unidad: 'm', categoryId })
+        .post('/api/inventory/entries')
+        .send({ materialId, cantidad: 10 })
         .expect(401);
     });
 
-    it('returns 404 for invalid categoryId', () => {
+    it('returns 404 for invalid materialId', () => {
       return request(app.getHttpServer())
-        .post('/api/materials')
+        .post('/api/inventory/entries')
         .set('Authorization', `Bearer ${adminToken}`)
-        .send({ nombre: 'Test Material', unidad: 'm', categoryId: 9999 })
+        .send({ materialId: 9999, cantidad: 10 })
         .expect(404);
     });
   });
 
-  describe('GET /api/materials', () => {
+  describe('POST /api/inventory/exits', () => {
+    it('admin can create exit — stock decreases', async () => {
+      // Check current stock first
+      const matBefore = await request(app.getHttpServer())
+        .get(`/api/materials/${materialId}`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .expect(200);
+
+      const stockBefore = matBefore.body.stockActual;
+
+      const res = await request(app.getHttpServer())
+        .post('/api/inventory/exits')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ materialId, cantidad: 30, motivo: 'Consumo producción' })
+        .expect(201);
+
+      expect(res.body.materialId).toBe(materialId);
+      expect(res.body.cantidad).toBe(30);
+
+      const matAfter = await request(app.getHttpServer())
+        .get(`/api/materials/${materialId}`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .expect(200);
+
+      expect(matAfter.body.stockActual).toBe(stockBefore - 30);
+    });
+
+    it('returns 400 when cantidad > stockActual', async () => {
+      // First exit all remaining stock
+      const matRes = await request(app.getHttpServer())
+        .get(`/api/materials/${materialId}`)
+        .set('Authorization', `Bearer ${adminToken}`);
+      const currentStock = matRes.body.stockActual;
+
+      const res = await request(app.getHttpServer())
+        .post('/api/inventory/exits')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ materialId, cantidad: currentStock + 100 })
+        .expect(400);
+
+      expect(res.body.message).toContain('Stock insuficiente');
+    });
+
+    it('returns 401 without token', () => {
+      return request(app.getHttpServer())
+        .post('/api/inventory/exits')
+        .send({ materialId, cantidad: 10 })
+        .expect(401);
+    });
+  });
+
+  describe('GET /api/inventory/entries', () => {
     it('returns paginated list', async () => {
       const res = await request(app.getHttpServer())
-        .get('/api/materials')
+        .get('/api/inventory/entries')
         .set('Authorization', `Bearer ${adminToken}`)
         .expect(200);
 
@@ -138,18 +200,18 @@ describe('Materials (e2e)', () => {
       expect(res.body.total).toBeGreaterThanOrEqual(1);
     });
 
-    it('filters by categoryId', async () => {
+    it('filters by materialId', async () => {
       const res = await request(app.getHttpServer())
-        .get(`/api/materials?categoryId=${categoryId}`)
+        .get(`/api/inventory/entries?materialId=${materialId}`)
         .set('Authorization', `Bearer ${adminToken}`)
         .expect(200);
 
-      expect(res.body.data.every((m: any) => m.categoryId === categoryId)).toBe(true);
+      expect(res.body.data.every((e: any) => e.materialId === materialId)).toBe(true);
     });
 
     it('pagination works', async () => {
       const res = await request(app.getHttpServer())
-        .get('/api/materials?page=1&limit=1')
+        .get('/api/inventory/entries?page=1&limit=1')
         .set('Authorization', `Bearer ${adminToken}`)
         .expect(200);
 
@@ -158,73 +220,48 @@ describe('Materials (e2e)', () => {
     });
   });
 
-  describe('GET /api/materials/low-stock', () => {
-    it('returns materials below stockMin', async () => {
+  describe('GET /api/inventory/exits', () => {
+    it('returns paginated list', async () => {
       const res = await request(app.getHttpServer())
-        .get('/api/materials/low-stock')
+        .get('/api/inventory/exits')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .expect(200);
+
+      expect(res.body.data).toBeDefined();
+      expect(res.body.total).toBeGreaterThanOrEqual(1);
+    });
+  });
+
+  describe('GET /api/inventory/movements/:materialId', () => {
+    it('returns combined entries and exits sorted by date', async () => {
+      const res = await request(app.getHttpServer())
+        .get(`/api/inventory/movements/${materialId}`)
         .set('Authorization', `Bearer ${adminToken}`)
         .expect(200);
 
       expect(Array.isArray(res.body)).toBe(true);
-    });
-  });
+      expect(res.body.length).toBeGreaterThanOrEqual(2);
 
-  describe('GET /api/materials/:id', () => {
-    it('returns material by ID with category relation', async () => {
-      const res = await request(app.getHttpServer())
-        .get(`/api/materials/${createdMaterialId}`)
-        .set('Authorization', `Bearer ${adminToken}`)
-        .expect(200);
+      // Each item has type 'entry' or 'exit'
+      res.body.forEach((item: any) => {
+        expect(['entry', 'exit']).toContain(item.type);
+        expect(item.cantidad).toBeDefined();
+        expect(item.date).toBeDefined();
+      });
 
-      expect(res.body.id).toBe(createdMaterialId);
-      expect(res.body.category).toBeDefined();
-    });
-  });
-
-  describe('PATCH /api/materials/:id', () => {
-    it('admin can update a material', async () => {
-      const res = await request(app.getHttpServer())
-        .patch(`/api/materials/${createdMaterialId}`)
-        .set('Authorization', `Bearer ${adminToken}`)
-        .send({ nombre: 'Cable actualizado' })
-        .expect(200);
-
-      expect(res.body.nombre).toBe('Cable actualizado');
+      // Verify sorted descending
+      for (let i = 1; i < res.body.length; i++) {
+        const prev = new Date(res.body[i - 1].date).getTime();
+        const curr = new Date(res.body[i].date).getTime();
+        expect(prev).toBeGreaterThanOrEqual(curr);
+      }
     });
 
-    it('warehouse can update a material', () => {
+    it('returns 404 for invalid materialId', () => {
       return request(app.getHttpServer())
-        .patch(`/api/materials/${createdMaterialId}`)
-        .set('Authorization', `Bearer ${warehouseToken}`)
-        .send({ stockMin: 150 })
-        .expect(200);
-    });
-  });
-
-  describe('DELETE /api/materials/:id — ConflictException check on category', () => {
-    it('cannot delete category that has linked materials (409)', () => {
-      return request(app.getHttpServer())
-        .delete(`/api/categories/${categoryId}`)
+        .get('/api/inventory/movements/9999')
         .set('Authorization', `Bearer ${adminToken}`)
-        .expect(409);
-    });
-  });
-
-  describe('DELETE /api/materials/:id', () => {
-    it('warehouse cannot delete a material (403)', () => {
-      return request(app.getHttpServer())
-        .delete(`/api/materials/${createdMaterialId}`)
-        .set('Authorization', `Bearer ${warehouseToken}`)
-        .expect(403);
-    });
-
-    it('admin can delete a material', async () => {
-      const res = await request(app.getHttpServer())
-        .delete(`/api/materials/${createdMaterialId}`)
-        .set('Authorization', `Bearer ${adminToken}`)
-        .expect(200);
-
-      expect(res.body.message).toBeDefined();
+        .expect(404);
     });
   });
 });

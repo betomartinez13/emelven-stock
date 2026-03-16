@@ -1,9 +1,11 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Material } from './entities/material.entity';
 import { Category } from '../categories/entities/category.entity';
 import { Supplier } from '../suppliers/entities/supplier.entity';
+import { InventoryEntry } from '../inventory/entities/inventory-entry.entity';
+import { InventoryExit } from '../inventory/entities/inventory-exit.entity';
 import { CreateMaterialDto } from './dto/create-material.dto';
 import { UpdateMaterialDto } from './dto/update-material.dto';
 import { MaterialFilterDto } from './dto/material-filter.dto';
@@ -18,6 +20,10 @@ export class MaterialsService {
     private categoriesRepository: Repository<Category>,
     @InjectRepository(Supplier)
     private suppliersRepository: Repository<Supplier>,
+    @InjectRepository(InventoryEntry)
+    private entriesRepository: Repository<InventoryEntry>,
+    @InjectRepository(InventoryExit)
+    private exitsRepository: Repository<InventoryExit>,
   ) {}
 
   async findAll(dto: MaterialFilterDto): Promise<PaginatedResult<Material>> {
@@ -106,6 +112,17 @@ export class MaterialsService {
 
   async remove(id: number): Promise<{ message: string }> {
     await this.findOne(id);
+
+    const entryCount = await this.entriesRepository.count({ where: { materialId: id } });
+    if (entryCount > 0) {
+      throw new ConflictException(`No se puede eliminar: ${entryCount} entradas de inventario usan este material`);
+    }
+
+    const exitCount = await this.exitsRepository.count({ where: { materialId: id } });
+    if (exitCount > 0) {
+      throw new ConflictException(`No se puede eliminar: ${exitCount} salidas de inventario usan este material`);
+    }
+
     await this.materialsRepository.delete(id);
     return { message: 'Material eliminado correctamente' };
   }

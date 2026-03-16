@@ -6,6 +6,7 @@ import { UsersModule } from './modules/users/users.module';
 import { CategoriesModule } from './modules/categories/categories.module';
 import { SuppliersModule } from './modules/suppliers/suppliers.module';
 import { MaterialsModule } from './modules/materials/materials.module';
+import { InventoryModule } from './modules/inventory/inventory.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { MaterialsModule } from './modules/materials/materials.module';
     CategoriesModule,
     SuppliersModule,
     MaterialsModule,
+    InventoryModule,
   ],
 })
 export class AppModule {}

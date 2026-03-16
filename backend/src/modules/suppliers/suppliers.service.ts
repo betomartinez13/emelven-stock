@@ -1,7 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
 import { Supplier } from './entities/supplier.entity';
+import { Material } from '../materials/entities/material.entity';
 import { CreateSupplierDto } from './dto/create-supplier.dto';
 import { UpdateSupplierDto } from './dto/update-supplier.dto';
 import { PaginationDto } from '../../common/dto/pagination.dto';
@@ -12,6 +13,8 @@ export class SuppliersService {
   constructor(
     @InjectRepository(Supplier)
     private suppliersRepository: Repository<Supplier>,
+    @InjectRepository(Material)
+    private materialsRepository: Repository<Material>,
   ) {}
 
   async findAll(dto: PaginationDto): Promise<PaginatedResult<Supplier>> {
@@ -45,7 +48,10 @@ export class SuppliersService {
 
   async remove(id: number): Promise<{ message: string }> {
     await this.findOne(id);
-    // TODO Phase 09: throw ConflictException if any Material references this supplier
+    const materialCount = await this.materialsRepository.count({ where: { supplierId: id } });
+    if (materialCount > 0) {
+      throw new ConflictException(`No se puede eliminar: ${materialCount} materiales usan este proveedor`);
+    }
     await this.suppliersRepository.delete(id);
     return { message: 'Proveedor eliminado correctamente' };
   }

@@ -3,6 +3,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { NotFoundException } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import { Category } from './entities/category.entity';
+import { Material } from '../materials/entities/material.entity';
 
 const mockCategory = (overrides = {}): Category =>
   ({ id: 1, nombre: 'Conductores', descripcion: 'Cables de cobre', createdAt: new Date(), updatedAt: new Date(), ...overrides } as Category);
@@ -13,6 +14,7 @@ const mockRepo = () => ({
   create: jest.fn(),
   save: jest.fn(),
   delete: jest.fn(),
+  count: jest.fn().mockResolvedValue(0),
 });
 
 describe('CategoriesService', () => {
@@ -24,6 +26,7 @@ describe('CategoriesService', () => {
       providers: [
         CategoriesService,
         { provide: getRepositoryToken(Category), useFactory: mockRepo },
+        { provide: getRepositoryToken(Material), useFactory: mockRepo },
       ],
     }).compile();
 

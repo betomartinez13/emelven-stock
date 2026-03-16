@@ -3,6 +3,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { NotFoundException } from '@nestjs/common';
 import { SuppliersService } from './suppliers.service';
 import { Supplier } from './entities/supplier.entity';
+import { Material } from '../materials/entities/material.entity';
 
 const mockSupplier = (overrides = {}): Supplier =>
   ({ id: 1, nombre: 'Proveedor A', contacto: 'Juan', telefono: '0412-0000000', email: 'a@test.com', direccion: 'Maracaibo', createdAt: new Date(), updatedAt: new Date(), ...overrides } as Supplier);
@@ -13,6 +14,7 @@ const mockRepo = () => ({
   create: jest.fn(),
   save: jest.fn(),
   delete: jest.fn(),
+  count: jest.fn().mockResolvedValue(0),
 });
 
 describe('SuppliersService', () => {
@@ -24,6 +26,7 @@ describe('SuppliersService', () => {
       providers: [
         SuppliersService,
         { provide: getRepositoryToken(Supplier), useFactory: mockRepo },
+        { provide: getRepositoryToken(Material), useFactory: mockRepo },
       ],
     }).compile();
 

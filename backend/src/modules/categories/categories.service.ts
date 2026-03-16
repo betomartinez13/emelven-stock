@@ -1,7 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Category } from './entities/category.entity';
+import { Material } from '../materials/entities/material.entity';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 
@@ -10,6 +11,8 @@ export class CategoriesService {
   constructor(
     @InjectRepository(Category)
     private categoriesRepository: Repository<Category>,
+    @InjectRepository(Material)
+    private materialsRepository: Repository<Material>,
   ) {}
 
   findAll(): Promise<Category[]> {
@@ -35,7 +38,10 @@ export class CategoriesService {
 
   async remove(id: number): Promise<{ message: string }> {
     await this.findOne(id);
-    // TODO Phase 09: throw ConflictException if any Material references this category
+    const materialCount = await this.materialsRepository.count({ where: { categoryId: id } });
+    if (materialCount > 0) {
+      throw new ConflictException(`No se puede eliminar: ${materialCount} materiales usan esta categoría`);
+    }
     await this.categoriesRepository.delete(id);
     return { message: 'Categoría eliminada correctamente' };
   }

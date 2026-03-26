@@ -6,6 +6,7 @@ import { InventoryService } from './inventory.service';
 import { InventoryEntry } from './entities/inventory-entry.entity';
 import { InventoryExit } from './entities/inventory-exit.entity';
 import { Material } from '../materials/entities/material.entity';
+import { AlertsService } from '../alerts/alerts.service';
 
 const mockMaterial = (overrides = {}) =>
   ({
@@ -76,6 +77,7 @@ describe('InventoryService', () => {
         { provide: getRepositoryToken(InventoryExit), useFactory: mockRepo },
         { provide: getRepositoryToken(Material), useFactory: mockRepo },
         { provide: DataSource, useValue: dataSource },
+        { provide: AlertsService, useValue: { checkAndCreateAlert: jest.fn().mockResolvedValue(undefined) } },
       ],
     }).compile();
 
@@ -146,6 +148,7 @@ describe('InventoryService', () => {
         update: jest.fn().mockResolvedValue(undefined),
       };
       dataSource.transaction.mockImplementation((cb: (manager: typeof manager) => Promise<InventoryExit>) => cb(manager));
+      materialsRepo.findOne.mockResolvedValue(mockMaterial({ stockActual: 70 }));
 
       const result = await service.createExit({ materialId: 1, cantidad: 30 }, 1);
 
@@ -174,6 +177,7 @@ describe('InventoryService', () => {
         update: jest.fn(),
       };
       dataSource.transaction.mockImplementation((cb: (manager: typeof manager) => Promise<InventoryExit>) => cb(manager));
+      materialsRepo.findOne.mockResolvedValue(null);
 
       await expect(service.createExit({ materialId: 999, cantidad: 10 }, 1)).rejects.toThrow(NotFoundException);
     });

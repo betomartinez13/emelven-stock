@@ -8,6 +8,7 @@ import { CreateEntryDto } from './dto/create-entry.dto';
 import { CreateExitDto } from './dto/create-exit.dto';
 import { InventoryFilterDto } from './dto/inventory-filter.dto';
 import { PaginatedResult } from '../../common/interfaces/paginated-result.interface';
+import { AlertsService } from '../alerts/alerts.service';
 
 export interface MovementItem {
   id: number;
@@ -30,6 +31,7 @@ export class InventoryService {
     @InjectRepository(Material)
     private materialsRepository: Repository<Material>,
     private dataSource: DataSource,
+    private alertsService: AlertsService,
   ) {}
 
   async createEntry(dto: CreateEntryDto, userId: number): Promise<InventoryEntry> {
@@ -56,7 +58,7 @@ export class InventoryService {
   }
 
   async createExit(dto: CreateExitDto, userId: number): Promise<InventoryExit> {
-    return this.dataSource.transaction(async (manager) => {
+    const exit = await this.dataSource.transaction(async (manager) => {
       const material = await manager.findOne(Material, {
         where: { id: dto.materialId },
         lock: { mode: 'pessimistic_write' },
@@ -69,19 +71,27 @@ export class InventoryService {
         );
       }
 
-      const exit = manager.create(InventoryExit, {
+      const exitEntity = manager.create(InventoryExit, {
         ...dto,
         userId,
         fechaSalida: dto.fechaSalida ? new Date(dto.fechaSalida) : new Date(),
       });
-      await manager.save(exit);
+      await manager.save(exitEntity);
 
       await manager.update(Material, material.id, {
         stockActual: Number(material.stockActual) - Number(dto.cantidad),
       });
 
-      return exit;
+      return exitEntity;
     });
+
+    // Call AFTER the transaction commits so the pessimistic lock on Material is released
+    const updatedMaterial = await this.materialsRepository.findOne({ where: { id: dto.materialId } });
+    if (updatedMaterial) {
+      await this.alertsService.checkAndCreateAlert(updatedMaterial);
+    }
+
+    return exit;
   }
 
   async findAllEntries(dto: InventoryFilterDto): Promise<PaginatedResult<InventoryEntry>> {

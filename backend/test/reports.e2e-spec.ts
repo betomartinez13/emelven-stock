@@ -266,4 +266,41 @@ describe('Reports (e2e)', () => {
         .expect(200);
     });
   });
+
+  describe('PDF Export endpoints', () => {
+    it('GET /api/reports/export/pdf/monthly returns application/pdf', async () => {
+      const res = await request(app.getHttpServer())
+        .get(`/api/reports/export/pdf/monthly?year=${testYear}`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .expect(200);
+
+      expect(res.headers['content-type']).toContain('application/pdf');
+      expect(res.body).toBeDefined();
+    }, 15000);
+
+    it('GET /api/reports/export/pdf/project/:id returns application/pdf', async () => {
+      const res = await request(app.getHttpServer())
+        .get(`/api/reports/export/pdf/project/${workOrderId}`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .expect(200);
+
+      expect(res.headers['content-type']).toContain('application/pdf');
+    }, 15000);
+
+    it('GET /api/reports/export/pdf/inventory returns application/pdf', async () => {
+      const res = await request(app.getHttpServer())
+        .get('/api/reports/export/pdf/inventory')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .expect(200);
+
+      expect(res.headers['content-type']).toContain('application/pdf');
+    }, 15000);
+
+    it('warehouse role gets 403 on PDF endpoints', async () => {
+      await request(app.getHttpServer())
+        .get('/api/reports/export/pdf/inventory')
+        .set('Authorization', `Bearer ${warehouseToken}`)
+        .expect(403);
+    });
+  });
 });

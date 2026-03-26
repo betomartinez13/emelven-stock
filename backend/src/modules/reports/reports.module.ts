@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ReportsService } from './reports.service';
 import { ReportsController } from './reports.controller';
+import { PdfModule } from '../pdf/pdf.module';
 import { Material } from '../materials/entities/material.entity';
 import { WorkOrder } from '../work-orders/entities/work-order.entity';
 import { Sale } from '../sales/entities/sale.entity';
@@ -11,6 +12,7 @@ import { InventoryExit } from '../inventory/entities/inventory-exit.entity';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Material, WorkOrder, Sale, InventoryEntry, InventoryExit]),
+    PdfModule,
   ],
   controllers: [ReportsController],
   providers: [ReportsService],

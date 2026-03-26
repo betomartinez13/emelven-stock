@@ -179,4 +179,8 @@ export class ReportsService {
         : null,
     };
   }
+
+  async findAllMaterials(): Promise<Material[]> {
+    return this.materialsRepo.find({ order: { nombre: 'ASC' } });
+  }
 }

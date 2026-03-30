@@ -11,6 +11,10 @@ import CategoriesPage from './pages/categories/CategoriesPage';
 import SuppliersListPage from './pages/suppliers/SuppliersListPage';
 import SupplierFormPage from './pages/suppliers/SupplierFormPage';
 
+// Materials
+import MaterialsListPage from './pages/materials/MaterialsListPage';
+import MaterialFormPage from './pages/materials/MaterialFormPage';
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -42,6 +46,11 @@ function App() {
               <Route path="/suppliers" element={<SuppliersListPage />} />
               <Route path="/suppliers/new" element={<SupplierFormPage />} />
               <Route path="/suppliers/:id/edit" element={<SupplierFormPage />} />
+
+              {/* Materials */}
+              <Route path="/materials" element={<MaterialsListPage />} />
+              <Route path="/materials/new" element={<MaterialFormPage />} />
+              <Route path="/materials/:id/edit" element={<MaterialFormPage />} />
             </Route>
           </Route>
           <Route path="*" element={<Navigate to="/dashboard" replace />} />

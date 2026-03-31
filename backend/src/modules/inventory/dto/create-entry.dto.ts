@@ -1,4 +1,4 @@
-import { IsInt, IsNumber, IsOptional, IsString, IsDateString, Min } from 'class-validator';
+import { IsInt, IsNumber, IsOptional, IsString, IsDateString, Min, MaxLength } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateEntryDto {
@@ -18,5 +18,6 @@ export class CreateEntryDto {
 
   @IsOptional()
   @IsString()
+  @MaxLength(255)
   observacion?: string;
 }

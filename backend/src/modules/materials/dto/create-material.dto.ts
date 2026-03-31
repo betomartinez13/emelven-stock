@@ -1,16 +1,18 @@
-import { IsString, IsOptional, IsNumber, IsInt, Min, MinLength } from 'class-validator';
-import { Type } from 'class-transformer';
+import { IsString, IsOptional, IsNumber, IsInt, Min, MinLength, MaxLength } from 'class-validator';
+import { Type, Transform } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateMaterialDto {
   @ApiProperty()
   @IsString()
   @MinLength(2)
+  @MaxLength(150)
   nombre: string;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
+  @MaxLength(500)
   descripcion?: string;
 
   @ApiProperty({ example: 'kg', description: 'kg, m, unidad, litro, rollo, m2, par' })
@@ -46,6 +48,7 @@ export class CreateMaterialDto {
 
   @ApiPropertyOptional()
   @IsOptional()
+  @Transform(({ value }) => (value === 0 || value === '' ? undefined : value))
   @Type(() => Number)
   @IsInt()
   @Min(1)

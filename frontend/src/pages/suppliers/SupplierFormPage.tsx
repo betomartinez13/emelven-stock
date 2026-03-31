@@ -11,11 +11,11 @@ import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import { useSupplier, useCreateSupplier, useUpdateSupplier } from '../../hooks/useSuppliers';
 
 const schema = z.object({
-  nombre:    z.string().min(1, 'El nombre es requerido'),
-  contacto:  z.string().optional(),
-  telefono:  z.string().optional(),
+  nombre:    z.string().min(1, 'El nombre es requerido').max(150, 'Máximo 150 caracteres'),
+  contacto:  z.string().max(100, 'Máximo 100 caracteres').optional(),
+  telefono:  z.string().max(20, 'Máximo 20 caracteres').optional(),
   email:     z.string().email('Email inválido').optional().or(z.literal('')),
-  direccion: z.string().optional(),
+  direccion: z.string().max(200, 'Máximo 200 caracteres').optional(),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -95,18 +95,23 @@ export default function SupplierFormPage() {
             {...register('nombre')}
             error={errors.nombre?.message}
             placeholder="Ej: Distribuidora El Sol"
+            maxLength={150}
           />
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input
               label="Persona de contacto"
               {...register('contacto')}
+              error={errors.contacto?.message}
               placeholder="Nombre del contacto"
+              maxLength={100}
             />
             <Input
               label="Teléfono"
               {...register('telefono')}
+              error={errors.telefono?.message}
               placeholder="Ej: 0414-1234567"
+              maxLength={20}
             />
           </div>
 
@@ -121,7 +126,9 @@ export default function SupplierFormPage() {
           <Input
             label="Dirección"
             {...register('direccion')}
+            error={errors.direccion?.message}
             placeholder="Dirección del proveedor"
+            maxLength={200}
           />
 
           <div className="flex justify-end gap-3 pt-2">

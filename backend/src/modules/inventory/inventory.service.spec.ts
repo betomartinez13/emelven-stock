@@ -27,6 +27,7 @@ const mockEntry = (overrides = {}) =>
     cantidad: 50,
     fechaEntrada: new Date('2026-01-10T10:00:00Z'),
     userId: 1,
+    user: { nombre: 'Test', apellido: 'User' },
     ...overrides,
   } as InventoryEntry);
 
@@ -37,6 +38,7 @@ const mockExit = (overrides = {}) =>
     cantidad: 30,
     fechaSalida: new Date('2026-01-11T10:00:00Z'),
     userId: 1,
+    user: { nombre: 'Test', apellido: 'User' },
     ...overrides,
   } as InventoryExit);
 
@@ -232,7 +234,7 @@ describe('InventoryService', () => {
       expect(result).toHaveLength(2);
       expect(result[0].type).toBe('exit');   // More recent
       expect(result[1].type).toBe('entry');
-      expect(result[0].date.getTime()).toBeGreaterThan(result[1].date.getTime());
+      expect(new Date(result[0].fecha).getTime()).toBeGreaterThan(new Date(result[1].fecha).getTime());
     });
 
     it('throws NotFoundException for invalid materialId', async () => {

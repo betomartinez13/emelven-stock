@@ -14,10 +14,11 @@ export interface MovementItem {
   id: number;
   type: 'entry' | 'exit';
   cantidad: number;
-  date: Date;
+  fecha: Date;
   observacion?: string;
   motivo?: string;
   userId: number;
+  user: { nombre: string; apellido: string };
   workOrderId?: number;
 }
 
@@ -104,6 +105,9 @@ export class InventoryService {
       .leftJoinAndSelect('entry.user', 'user')
       .orderBy('entry.fechaEntrada', 'DESC');
 
+    if (dto.search) {
+      qb.andWhere('material.nombre LIKE :search', { search: `%${dto.search}%` });
+    }
     if (dto.materialId) {
       qb.andWhere('entry.materialId = :materialId', { materialId: dto.materialId });
     }
@@ -129,6 +133,9 @@ export class InventoryService {
       .leftJoinAndSelect('exit.user', 'user')
       .orderBy('exit.fechaSalida', 'DESC');
 
+    if (dto.search) {
+      qb.andWhere('material.nombre LIKE :search', { search: `%${dto.search}%` });
+    }
     if (dto.materialId) {
       qb.andWhere('exit.materialId = :materialId', { materialId: dto.materialId });
     }
@@ -148,29 +155,36 @@ export class InventoryService {
     const material = await this.materialsRepository.findOne({ where: { id: materialId } });
     if (!material) throw new NotFoundException('Material no encontrado');
 
-    const entries = await this.entriesRepository.find({ where: { materialId } });
-    const exits = await this.exitsRepository.find({ where: { materialId } });
+    const entries = await this.entriesRepository.find({
+      where: { materialId },
+      relations: ['user'],
+    });
+    const exits = await this.exitsRepository.find({
+      where: { materialId },
+      relations: ['user'],
+    });
 
     const movements: MovementItem[] = [
       ...entries.map((e) => ({
         id: e.id,
         type: 'entry' as const,
         cantidad: e.cantidad,
-        date: e.fechaEntrada,
+        fecha: e.fechaEntrada,
         observacion: e.observacion,
         userId: e.userId,
+        user: { nombre: e.user.nombre, apellido: e.user.apellido },
       })),
       ...exits.map((e) => ({
         id: e.id,
         type: 'exit' as const,
         cantidad: e.cantidad,
-        date: e.fechaSalida,
+        fecha: e.fechaSalida,
         motivo: e.motivo,
         userId: e.userId,
-        workOrderId: e.workOrderId,
+        user: { nombre: e.user.nombre, apellido: e.user.apellido },
       })),
     ];
 
-    return movements.sort((a, b) => b.date.getTime() - a.date.getTime());
+    return movements.sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());
   }
 }

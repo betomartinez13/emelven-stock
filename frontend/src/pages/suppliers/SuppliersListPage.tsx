@@ -33,12 +33,12 @@ export default function SuppliersListPage() {
     {
       header: 'Nombre',
       accessor: 'nombre',
-      render: (_, row) => <span className="font-medium text-gray-800">{row.nombre}</span>,
+      render: (_, row) => <span className="font-medium text-gray-800 block max-w-[180px] truncate" title={row.nombre}>{row.nombre}</span>,
     },
-    { header: 'Contacto',  accessor: 'contacto',  render: (_, row) => row.contacto  ?? '—' },
-    { header: 'Teléfono',  accessor: 'telefono',  render: (_, row) => row.telefono  ?? '—' },
-    { header: 'Email',     accessor: 'email',     render: (_, row) => row.email     ?? '—' },
-    { header: 'Dirección', accessor: 'direccion', render: (_, row) => row.direccion ?? '—' },
+    { header: 'Contacto',  accessor: 'contacto',  render: (_, row) => <span className="block max-w-[120px] truncate" title={row.contacto ?? ''}>{row.contacto ?? '—'}</span> },
+    { header: 'Teléfono',  accessor: 'telefono',  render: (_, row) => <span className="block max-w-[130px] truncate" title={row.telefono ?? ''}>{row.telefono ?? '—'}</span> },
+    { header: 'Email',     accessor: 'email',     render: (_, row) => <span className="block max-w-[180px] truncate" title={row.email ?? ''}>{row.email ?? '—'}</span> },
+    { header: 'Dirección', accessor: 'direccion', render: (_, row) => <span className="block max-w-[160px] truncate" title={row.direccion ?? ''}>{row.direccion ?? '—'}</span> },
     {
       header: 'Acciones',
       accessor: 'id',

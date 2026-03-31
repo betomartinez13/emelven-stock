@@ -13,7 +13,7 @@ export class Material extends BaseEntity {
   @Column()
   nombre: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'text', nullable: true })
   descripcion: string;
 
   @Column()

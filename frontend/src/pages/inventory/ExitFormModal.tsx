@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useForm, useWatch } from 'react-hook-form';
+import { useForm, type Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { HiExclamation } from 'react-icons/hi';
@@ -13,10 +13,14 @@ const schema = z.object({
   materialId: z.coerce.number().min(1, 'Seleccione un material'),
   cantidad: z.coerce.number().positive('Debe ser mayor a 0'),
   fechaSalida: z.string().min(1, 'Campo requerido'),
-  motivo: z.string().optional(),
+  motivo: z.string().max(255, 'Máximo 255 caracteres').optional(),
 });
 
 type FormData = z.infer<typeof schema>;
+
+const fieldClass = 'w-full border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors';
+const labelClass = 'block text-sm font-medium text-slate-700 mb-1';
+const errorClass = 'mt-1 text-xs text-red-500';
 
 interface ExitFormModalProps {
   isOpen: boolean;
@@ -29,7 +33,7 @@ export default function ExitFormModal({ isOpen, onClose }: ExitFormModalProps) {
   const [selectedMaterial, setSelectedMaterial] = useState<Material | null>(null);
 
   const { register, handleSubmit, reset, watch, formState: { errors } } = useForm<FormData>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(schema) as Resolver<FormData>,
     defaultValues: { fechaSalida: new Date().toISOString().split('T')[0] },
   });
 
@@ -56,22 +60,22 @@ export default function ExitFormModal({ isOpen, onClose }: ExitFormModalProps) {
     <Modal isOpen={isOpen} onClose={onClose} title="Registrar Salida">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Material *</label>
-          <select {...register('materialId')} className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <label className={labelClass}>Material *</label>
+          <select {...register('materialId')} className={fieldClass}>
             <option value="">Seleccionar...</option>
             {materialsData?.data.map(m => (
               <option key={m.id} value={m.id}>{m.nombre} (Stock: {m.stockActual} {m.unidad})</option>
             ))}
           </select>
-          {errors.materialId && <p className="mt-1 text-xs text-red-600">{errors.materialId.message}</p>}
+          {errors.materialId && <p className={errorClass}>{errors.materialId.message}</p>}
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Cantidad *</label>
-          <input type="number" step="any" {...register('cantidad')} className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-          {errors.cantidad && <p className="mt-1 text-xs text-red-600">{errors.cantidad.message}</p>}
+          <label className={labelClass}>Cantidad *</label>
+          <input type="number" step="any" {...register('cantidad')} className={fieldClass} placeholder="0" />
+          {errors.cantidad && <p className={errorClass}>{errors.cantidad.message}</p>}
           {stockInsuficiente && (
-            <div className="mt-1 flex items-center gap-1 text-xs text-red-600">
+            <div className="mt-1 flex items-center gap-1 text-xs text-red-500">
               <HiExclamation className="w-4 h-4" />
               Stock insuficiente. Disponible: {selectedMaterial?.stockActual} {selectedMaterial?.unidad}
             </div>
@@ -79,19 +83,19 @@ export default function ExitFormModal({ isOpen, onClose }: ExitFormModalProps) {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Fecha de salida *</label>
-          <input type="date" {...register('fechaSalida')} className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-          {errors.fechaSalida && <p className="mt-1 text-xs text-red-600">{errors.fechaSalida.message}</p>}
+          <label className={labelClass}>Fecha de salida *</label>
+          <input type="date" {...register('fechaSalida')} className={fieldClass} />
+          {errors.fechaSalida && <p className={errorClass}>{errors.fechaSalida.message}</p>}
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Motivo</label>
-          <textarea {...register('motivo')} rows={2} className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <label className={labelClass}>Motivo</label>
+          <textarea {...register('motivo')} maxLength={255} rows={2} className={fieldClass} placeholder="Opcional..." />
         </div>
 
         <div className="flex justify-end gap-3 pt-2">
           <Button type="button" variant="secondary" onClick={onClose}>Cancelar</Button>
-          <Button type="submit" loading={createExit.isPending} disabled={stockInsuficiente}>
+          <Button type="submit" loading={createExit.isPending} disabled={!!stockInsuficiente}>
             Registrar salida
           </Button>
         </div>

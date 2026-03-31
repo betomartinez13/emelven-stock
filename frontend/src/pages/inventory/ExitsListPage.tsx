@@ -18,29 +18,29 @@ export default function ExitsListPage() {
 
   const columns: Column<InventoryExit>[] = [
     {
-      key: 'material',
+      accessor: 'material',
       header: 'Material',
-      render: e => <span className="font-medium text-gray-900">{e.material.nombre}</span>,
+      render: (_, e) => <span className="font-medium text-slate-800">{e.material.nombre}</span>,
     },
     {
-      key: 'cantidad',
+      accessor: 'cantidad',
       header: 'Cantidad',
-      render: e => `${formatNumber(e.cantidad)} ${e.material.unidad}`,
+      render: (_, e) => `${formatNumber(e.cantidad)} ${e.material.unidad}`,
     },
-    { key: 'fechaSalida', header: 'Fecha', render: e => formatDate(e.fechaSalida) },
-    { key: 'motivo', header: 'Motivo', render: e => e.motivo ?? '—' },
-    { key: 'workOrder', header: 'Orden de Trabajo', render: e => e.workOrder?.codigo ?? '—' },
+    { accessor: 'fechaSalida', header: 'Fecha', render: (_, e) => formatDate(e.fechaSalida) },
+    { accessor: 'motivo', header: 'Motivo', render: (_, e) => <span className="block max-w-[200px] truncate" title={e.motivo ?? ''}>{e.motivo ?? '—'}</span> },
+    { accessor: 'workOrder', header: 'Orden de Trabajo', render: (_, e) => e.workOrder?.codigo ?? '—' },
     {
-      key: 'user',
+      accessor: 'user',
       header: 'Registrado por',
-      render: e => `${e.user.nombre} ${e.user.apellido}`,
+      render: (_, e) => `${e.user.nombre} ${e.user.apellido}`,
     },
   ];
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Salidas de Inventario</h1>
+        <h1 className="text-2xl font-bold text-slate-800">Salidas de Inventario</h1>
         <RoleGate roles={['admin', 'warehouse']}>
           <Button leftIcon={<HiPlus className="w-4 h-4" />} onClick={() => setShowModal(true)}>
             Nueva Salida

@@ -12,6 +12,11 @@ import SuppliersListPage from './pages/suppliers/SuppliersListPage';
 import SupplierFormPage from './pages/suppliers/SupplierFormPage';
 
 // Materials
+// Inventory
+import EntriesListPage from './pages/inventory/EntriesListPage';
+import ExitsListPage from './pages/inventory/ExitsListPage';
+
+// Materials
 import MaterialsListPage from './pages/materials/MaterialsListPage';
 import MaterialFormPage from './pages/materials/MaterialFormPage';
 
@@ -46,6 +51,10 @@ function App() {
               <Route path="/suppliers" element={<SuppliersListPage />} />
               <Route path="/suppliers/new" element={<SupplierFormPage />} />
               <Route path="/suppliers/:id/edit" element={<SupplierFormPage />} />
+
+              {/* Inventory */}
+              <Route path="/inventory/entries" element={<EntriesListPage />} />
+              <Route path="/inventory/exits" element={<ExitsListPage />} />
 
               {/* Materials */}
               <Route path="/materials" element={<MaterialsListPage />} />

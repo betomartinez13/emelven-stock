@@ -7,6 +7,7 @@ import { useMaterial, useCreateMaterial, useUpdateMaterial } from '../../hooks/u
 import { useCategories } from '../../hooks/useCategories';
 import { useSuppliers } from '../../hooks/useSuppliers';
 import Button from '../../components/ui/Button';
+import PageFormHeader from '../../components/shared/PageFormHeader';
 
 const schema = z.object({
   nombre: z.string().min(1, 'Campo requerido').max(150, 'Máximo 150 caracteres'),
@@ -70,14 +71,11 @@ export default function MaterialFormPage() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <div className="flex items-center gap-3 mb-6">
-        <button onClick={() => navigate('/materials')} className="text-slate-500 hover:text-slate-800 text-sm font-medium transition-colors">
-          &larr; Volver
-        </button>
-        <h1 className="text-2xl font-bold text-slate-800 tracking-tight">
-          {isEdit ? 'Editar Material' : 'Nuevo Material'}
-        </h1>
-      </div>
+      <PageFormHeader
+        title={isEdit ? 'Editar Material' : 'Nuevo Material'}
+        subtitle={isEdit ? 'Modifica los datos del material' : 'Registra un nuevo material en el catálogo'}
+        onBack={() => navigate('/materials')}
+      />
 
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 md:p-8">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">

@@ -2,9 +2,9 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { HiArrowLeft } from 'react-icons/hi';
 import { useCreateWorkOrder } from '../../hooks/useWorkOrders';
 import Button from '../../components/ui/Button';
+import PageFormHeader from '../../components/shared/PageFormHeader';
 
 const schema = z.object({
   descripcion: z.string().min(1, 'Campo requerido').max(500),
@@ -32,19 +32,13 @@ export default function WorkOrderFormPage() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      {/* Header */}
-      <div className="flex items-center gap-3 mb-6">
-        <button
-          onClick={() => navigate('/work-orders')}
-          className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-slate-100 transition-colors"
-        >
-          <HiArrowLeft className="w-5 h-5" />
-        </button>
-        <h1 className="text-2xl font-bold text-slate-800">Nueva Orden de Trabajo</h1>
-      </div>
+      <PageFormHeader
+        title="Nueva Orden de Trabajo"
+        subtitle="El código de la orden se genera automáticamente."
+        onBack={() => navigate('/work-orders')}
+      />
 
       <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-6">
-        <p className="text-sm text-slate-400 mb-6">El código de la orden se genera automáticamente.</p>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Descripción del trabajo *</label>

@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { HiPlus } from 'react-icons/hi';
+import { HiPlus, HiEye } from 'react-icons/hi';
 import { useExits } from '../../hooks/useInventory';
 import DataTable from '../../components/shared/DataTable';
 import Button from '../../components/ui/Button';
 import RoleGate from '../../components/shared/RoleGate';
 import ExitFormModal from './ExitFormModal';
+import ExitDetailModal from './ExitDetailModal';
 import { formatDate, formatNumber } from '../../utils/formatters';
 import type { InventoryExit } from '../../types/inventory.types';
 import type { Column } from '../../components/ui/Table';
@@ -13,6 +14,7 @@ export default function ExitsListPage() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
+  const [selectedExit, setSelectedExit] = useState<InventoryExit | null>(null);
 
   const { data, isLoading } = useExits({ page, limit: 10, search });
 
@@ -34,6 +36,19 @@ export default function ExitsListPage() {
       accessor: 'user',
       header: 'Registrado por',
       render: (_, e) => `${e.user.nombre} ${e.user.apellido}`,
+    },
+    {
+      accessor: 'acciones',
+      header: '',
+      render: (_, e) => (
+        <button
+          onClick={() => setSelectedExit(e)}
+          className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-slate-100 transition-colors"
+          title="Ver detalles"
+        >
+          <HiEye className="w-4 h-4" />
+        </button>
+      ),
     },
   ];
 
@@ -61,6 +76,7 @@ export default function ExitsListPage() {
       />
 
       <ExitFormModal isOpen={showModal} onClose={() => setShowModal(false)} />
+      <ExitDetailModal exit={selectedExit} onClose={() => setSelectedExit(null)} />
     </div>
   );
 }

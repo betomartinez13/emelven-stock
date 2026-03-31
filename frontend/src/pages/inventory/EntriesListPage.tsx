@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { HiPlus } from 'react-icons/hi';
+import { HiPlus, HiEye } from 'react-icons/hi';
 import { useEntries } from '../../hooks/useInventory';
 import DataTable from '../../components/shared/DataTable';
 import Button from '../../components/ui/Button';
 import RoleGate from '../../components/shared/RoleGate';
 import EntryFormModal from './EntryFormModal';
+import EntryDetailModal from './EntryDetailModal';
 import { formatDate, formatNumber } from '../../utils/formatters';
 import type { InventoryEntry } from '../../types/inventory.types';
 import type { Column } from '../../components/ui/Table';
@@ -13,6 +14,7 @@ export default function EntriesListPage() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
+  const [selectedEntry, setSelectedEntry] = useState<InventoryEntry | null>(null);
 
   const { data, isLoading } = useEntries({ page, limit: 10, search });
 
@@ -33,6 +35,19 @@ export default function EntriesListPage() {
       accessor: 'user',
       header: 'Registrado por',
       render: (_, e) => `${e.user.nombre} ${e.user.apellido}`,
+    },
+    {
+      accessor: 'acciones',
+      header: '',
+      render: (_, e) => (
+        <button
+          onClick={() => setSelectedEntry(e)}
+          className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-slate-100 transition-colors"
+          title="Ver detalles"
+        >
+          <HiEye className="w-4 h-4" />
+        </button>
+      ),
     },
   ];
 
@@ -60,6 +75,7 @@ export default function EntriesListPage() {
       />
 
       <EntryFormModal isOpen={showModal} onClose={() => setShowModal(false)} />
+      <EntryDetailModal entry={selectedEntry} onClose={() => setSelectedEntry(null)} />
     </div>
   );
 }

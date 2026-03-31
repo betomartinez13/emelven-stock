@@ -3,11 +3,11 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { HiArrowLeft } from 'react-icons/hi';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
+import PageFormHeader from '../../components/shared/PageFormHeader';
 import { useSupplier, useCreateSupplier, useUpdateSupplier } from '../../hooks/useSuppliers';
 
 const schema = z.object({
@@ -71,22 +71,11 @@ export default function SupplierFormPage() {
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
-      <div className="flex items-center gap-3">
-        <button
-          onClick={() => navigate('/suppliers')}
-          className="p-2 rounded-md text-gray-500 hover:bg-gray-100 transition-colors"
-        >
-          <HiArrowLeft className="w-5 h-5" />
-        </button>
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800">
-            {isEdit ? 'Editar Proveedor' : 'Nuevo Proveedor'}
-          </h1>
-          <p className="text-sm text-gray-500 mt-0.5">
-            {isEdit ? 'Modifica los datos del proveedor' : 'Registra un nuevo proveedor'}
-          </p>
-        </div>
-      </div>
+      <PageFormHeader
+        title={isEdit ? 'Editar Proveedor' : 'Nuevo Proveedor'}
+        subtitle={isEdit ? 'Modifica los datos del proveedor' : 'Registra un nuevo proveedor'}
+        onBack={() => navigate('/suppliers')}
+      />
 
       <Card>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">

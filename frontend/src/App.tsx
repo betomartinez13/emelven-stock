@@ -24,6 +24,10 @@ import WorkOrdersListPage from './pages/work-orders/WorkOrdersListPage';
 import WorkOrderFormPage from './pages/work-orders/WorkOrderFormPage';
 import WorkOrderDetailPage from './pages/work-orders/WorkOrderDetailPage';
 
+// Sales
+import SalesListPage from './pages/sales/SalesListPage';
+import SaleFormPage from './pages/sales/SaleFormPage';
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -76,6 +80,17 @@ function App() {
                 }
               />
               <Route path="/work-orders/:id" element={<WorkOrderDetailPage />} />
+
+              {/* Sales */}
+              <Route path="/sales" element={<SalesListPage />} />
+              <Route
+                path="/sales/new"
+                element={
+                  <RoleGate roles={['admin', 'warehouse']} fallback={<Navigate to="/sales" replace />}>
+                    <SaleFormPage />
+                  </RoleGate>
+                }
+              />
             </Route>
           </Route>
           <Route path="*" element={<Navigate to="/dashboard" replace />} />

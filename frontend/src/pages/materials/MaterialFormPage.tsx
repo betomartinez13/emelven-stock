@@ -9,14 +9,17 @@ import { useSuppliers } from '../../hooks/useSuppliers';
 import Button from '../../components/ui/Button';
 
 const schema = z.object({
-  nombre: z.string().min(1, 'Campo requerido'),
-  descripcion: z.string().optional(),
+  nombre: z.string().min(1, 'Campo requerido').max(150, 'Máximo 150 caracteres'),
+  descripcion: z.string().max(500, 'Máximo 500 caracteres').optional(),
   unidad: z.string().min(1, 'Campo requerido'),
   stockActual: z.coerce.number().min(0).optional(),
   stockMin: z.coerce.number().min(0, 'Debe ser ≥ 0'),
   stockMax: z.coerce.number().min(0, 'Debe ser ≥ 0'),
   categoryId: z.coerce.number().min(1, 'Seleccione una categoría'),
-  supplierId: z.coerce.number().optional(),
+  supplierId: z.preprocess(
+    (val) => (val === '' || val === null || val === undefined ? undefined : Number(val)),
+    z.number().int().min(1).optional()
+  ),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -55,11 +58,12 @@ export default function MaterialFormPage() {
   }, [material, reset]);
 
   const onSubmit = async (data: FormData) => {
+    const payload = { ...data, supplierId: data.supplierId || undefined };
     if (isEdit) {
-      const { stockActual, ...rest } = data;
+      const { stockActual, ...rest } = payload;
       await updateMaterial.mutateAsync({ id: Number(id), data: rest });
     } else {
-      await createMaterial.mutateAsync(data);
+      await createMaterial.mutateAsync(payload);
     }
     navigate('/materials');
   };
@@ -67,33 +71,33 @@ export default function MaterialFormPage() {
   return (
     <div className="max-w-2xl mx-auto">
       <div className="flex items-center gap-3 mb-6">
-        <button onClick={() => navigate('/materials')} className="text-gray-400 hover:text-gray-600 text-sm">
-          ← Volver
+        <button onClick={() => navigate('/materials')} className="text-slate-500 hover:text-slate-800 text-sm font-medium transition-colors">
+          &larr; Volver
         </button>
-        <h1 className="text-2xl font-bold text-gray-900">
+        <h1 className="text-2xl font-bold text-slate-800 tracking-tight">
           {isEdit ? 'Editar Material' : 'Nuevo Material'}
         </h1>
       </div>
 
-      <div className="bg-white rounded-lg shadow p-6">
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 md:p-8">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {/* Nombre */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
-            <input {...register('nombre')} className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Nombre *</label>
+            <input {...register('nombre')} maxLength={150} className="w-full border border-slate-300 rounded-lg px-4 py-2.5 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow" />
             {errors.nombre && <p className="mt-1 text-xs text-red-600">{errors.nombre.message}</p>}
           </div>
 
           {/* Descripción */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
-            <textarea {...register('descripcion')} rows={2} className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Descripción</label>
+            <textarea {...register('descripcion')} maxLength={500} rows={2} className="w-full border border-slate-300 rounded-lg px-4 py-2.5 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow" />
           </div>
 
           {/* Unidad */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Unidad *</label>
-            <select {...register('unidad')} className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Unidad *</label>
+            <select {...register('unidad')} className="w-full border border-slate-300 rounded-lg px-4 py-2.5 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow bg-white">
               <option value="">Seleccionar...</option>
               {UNITS.map(u => <option key={u} value={u}>{u}</option>)}
             </select>
@@ -102,8 +106,8 @@ export default function MaterialFormPage() {
 
           {/* Categoría */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Categoría *</label>
-            <select {...register('categoryId')} className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Categoría *</label>
+            <select {...register('categoryId')} className="w-full border border-slate-300 rounded-lg px-4 py-2.5 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow bg-white">
               <option value="">Seleccionar...</option>
               {categories?.map(c => <option key={c.id} value={c.id}>{c.nombre}</option>)}
             </select>
@@ -112,23 +116,24 @@ export default function MaterialFormPage() {
 
           {/* Proveedor */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Proveedor (opcional)</label>
-            <select {...register('supplierId')} className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Proveedor (opcional)</label>
+            <select {...register('supplierId')} className="w-full border border-slate-300 rounded-lg px-4 py-2.5 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow bg-white">
               <option value="">Sin proveedor</option>
               {suppliersData?.data.map(s => <option key={s.id} value={s.id}>{s.nombre}</option>)}
             </select>
+            {errors.supplierId?.message && <p className="mt-1 text-xs text-red-600">{errors.supplierId.message as string}</p>}
           </div>
 
           {/* Stock min/max */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-5">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Stock Mínimo *</label>
-              <input type="number" step="any" {...register('stockMin')} className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              <label className="block text-sm font-semibold text-slate-700 mb-1.5">Stock Mínimo *</label>
+              <input type="number" step="any" {...register('stockMin')} className="w-full border border-slate-300 rounded-lg px-4 py-2.5 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow" />
               {errors.stockMin && <p className="mt-1 text-xs text-red-600">{errors.stockMin.message}</p>}
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Stock Máximo *</label>
-              <input type="number" step="any" {...register('stockMax')} className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              <label className="block text-sm font-semibold text-slate-700 mb-1.5">Stock Máximo *</label>
+              <input type="number" step="any" {...register('stockMax')} className="w-full border border-slate-300 rounded-lg px-4 py-2.5 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow" />
               {errors.stockMax && <p className="mt-1 text-xs text-red-600">{errors.stockMax.message}</p>}
             </div>
           </div>
@@ -136,13 +141,13 @@ export default function MaterialFormPage() {
           {/* Stock actual — solo al crear */}
           {!isEdit && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Stock Inicial</label>
-              <input type="number" step="any" {...register('stockActual')} defaultValue={0} className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-              <p className="mt-1 text-xs text-gray-400">En edición el stock solo se modifica via entradas/salidas.</p>
+              <label className="block text-sm font-semibold text-slate-700 mb-1.5">Stock Inicial</label>
+              <input type="number" step="any" {...register('stockActual')} defaultValue={0} className="w-full border border-slate-300 rounded-lg px-4 py-2.5 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow" />
+              <p className="mt-1.5 text-xs text-slate-500 font-medium">En edición el stock solo se modifica via entradas/salidas.</p>
             </div>
           )}
 
-          <div className="flex justify-end gap-3 pt-2">
+          <div className="flex justify-end gap-3 pt-4 mt-2 border-t border-slate-100">
             <Button type="button" variant="secondary" onClick={() => navigate('/materials')}>Cancelar</Button>
             <Button type="submit" loading={isSubmitting}>
               {isEdit ? 'Guardar cambios' : 'Crear material'}

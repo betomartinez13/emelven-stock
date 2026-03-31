@@ -64,24 +64,31 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
   }, [open, onClose]);
 
   const sidebarContent = (
-    <div className="flex flex-col h-full w-64 bg-white shadow-lg">
+    <div className="flex flex-col h-full w-64 bg-slate-950 border-r border-slate-800 shadow-2xl overflow-hidden">
       {/* Logo */}
-      <div className="flex items-center justify-between px-6 py-5 border-b border-gray-200">
-        <div>
-          <h1 className="text-xl font-bold text-blue-600">EMELVEN</h1>
-          <p className="text-xs text-gray-400">Control de Inventario</p>
+      <div className="flex items-center justify-between px-6 py-6 border-b border-slate-800 bg-slate-950">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
+            <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+            </svg>
+          </div>
+          <div>
+            <h1 className="text-lg font-bold text-white tracking-wide">EMELVEN</h1>
+            <p className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold">Stock & ERP</p>
+          </div>
         </div>
         {/* Close button — mobile only */}
         <button
           onClick={onClose}
-          className="md:hidden p-1 rounded text-gray-400 hover:text-gray-600"
+          className="md:hidden p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
         >
           <HiX className="w-5 h-5" />
         </button>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+      <nav className="flex-1 overflow-y-auto px-4 py-6 space-y-1.5 custom-scrollbar">
         {visibleItems.map(({ path, label, icon: Icon }) => (
           <NavLink
             key={path}
@@ -91,14 +98,16 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
               if (window.innerWidth < 768) onClose();
             }}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+              `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200 ${
                 isActive
-                  ? 'bg-blue-50 text-blue-700'
-                  : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                  ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-900/20'
+                  : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 font-medium'
               }`
             }
           >
-            <Icon className="w-5 h-5 flex-shrink-0" />
+            <Icon className={`w-5 h-5 flex-shrink-0 transition-colors ${
+              location.pathname === path ? 'text-white' : 'text-slate-500 group-hover:text-slate-300'
+            }`} />
             {label}
           </NavLink>
         ))}

@@ -19,3 +19,10 @@ export const formatDateTime = (date: string | Date): string => {
 export const formatNumber = (n: number): string => {
   return new Intl.NumberFormat('es-VE', { maximumFractionDigits: 2 }).format(n);
 };
+
+const MONTHS_SHORT = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+
+export const formatDateShort = (date: string | Date): string => {
+  const d = new Date(date);
+  return `${d.getDate()} ${MONTHS_SHORT[d.getMonth()]} ${d.getFullYear()}`;
+};

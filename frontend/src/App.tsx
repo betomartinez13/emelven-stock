@@ -11,7 +11,6 @@ import CategoriesPage from './pages/categories/CategoriesPage';
 import SuppliersListPage from './pages/suppliers/SuppliersListPage';
 import SupplierFormPage from './pages/suppliers/SupplierFormPage';
 
-// Materials
 // Inventory
 import EntriesListPage from './pages/inventory/EntriesListPage';
 import ExitsListPage from './pages/inventory/ExitsListPage';
@@ -19,6 +18,11 @@ import ExitsListPage from './pages/inventory/ExitsListPage';
 // Materials
 import MaterialsListPage from './pages/materials/MaterialsListPage';
 import MaterialFormPage from './pages/materials/MaterialFormPage';
+
+// Work Orders
+import WorkOrdersListPage from './pages/work-orders/WorkOrdersListPage';
+import WorkOrderFormPage from './pages/work-orders/WorkOrderFormPage';
+import WorkOrderDetailPage from './pages/work-orders/WorkOrderDetailPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -60,6 +64,18 @@ function App() {
               <Route path="/materials" element={<MaterialsListPage />} />
               <Route path="/materials/new" element={<MaterialFormPage />} />
               <Route path="/materials/:id/edit" element={<MaterialFormPage />} />
+
+              {/* Work Orders */}
+              <Route path="/work-orders" element={<WorkOrdersListPage />} />
+              <Route
+                path="/work-orders/new"
+                element={
+                  <RoleGate roles={['admin', 'warehouse']} fallback={<Navigate to="/work-orders" replace />}>
+                    <WorkOrderFormPage />
+                  </RoleGate>
+                }
+              />
+              <Route path="/work-orders/:id" element={<WorkOrderDetailPage />} />
             </Route>
           </Route>
           <Route path="*" element={<Navigate to="/dashboard" replace />} />

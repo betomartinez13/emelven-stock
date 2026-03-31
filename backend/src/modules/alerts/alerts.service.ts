@@ -18,6 +18,12 @@ export class AlertsService {
     const stockMin    = Number(material.stockMin);
 
     if (stockActual <= 0) {
+      // Escalation: close any active LOW_STOCK for this material before creating CRITICAL.
+      // Uses repo.update() — same pattern as markAllAsRead, proven to work with MySQL booleans.
+      await this.alertsRepo.update(
+        { materialId: material.id, tipo: AlertType.LOW_STOCK, leida: false },
+        { leida: true },
+      );
       await this.createAlertIfNotExists(
         material,
         AlertType.CRITICAL_STOCK,
@@ -37,10 +43,10 @@ export class AlertsService {
     tipo: AlertType,
     mensaje: string,
   ): Promise<void> {
-    const existing = await this.alertsRepo.findOne({
+    const active = await this.alertsRepo.count({
       where: { materialId: material.id, tipo, leida: false },
     });
-    if (existing) return;
+    if (active > 0) return;
     await this.alertsRepo.save(this.alertsRepo.create({ materialId: material.id, tipo, mensaje }));
   }
 

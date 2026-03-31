@@ -28,6 +28,9 @@ import WorkOrderDetailPage from './pages/work-orders/WorkOrderDetailPage';
 import SalesListPage from './pages/sales/SalesListPage';
 import SaleFormPage from './pages/sales/SaleFormPage';
 
+// Alerts
+import AlertsPage from './pages/alerts/AlertsPage';
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -91,6 +94,9 @@ function App() {
                   </RoleGate>
                 }
               />
+
+              {/* Alerts */}
+              <Route path="/alerts" element={<AlertsPage />} />
             </Route>
           </Route>
           <Route path="*" element={<Navigate to="/dashboard" replace />} />

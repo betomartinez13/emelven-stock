@@ -33,8 +33,9 @@ export function useCreateMaterial() {
       qc.invalidateQueries({ queryKey: ['materials'] });
       toast.success('Material creado');
     },
-    onError: (err: any) => {
-      toast.error(err?.response?.data?.message ?? 'Error al crear material');
+    onError: (err: unknown) => {
+      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      toast.error(msg ?? 'Error al crear material');
     },
   });
 }
@@ -48,8 +49,9 @@ export function useUpdateMaterial() {
       qc.invalidateQueries({ queryKey: ['materials'] });
       toast.success('Material actualizado');
     },
-    onError: (err: any) => {
-      toast.error(err?.response?.data?.message ?? 'Error al actualizar material');
+    onError: (err: unknown) => {
+      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      toast.error(msg ?? 'Error al actualizar material');
     },
   });
 }
@@ -62,8 +64,9 @@ export function useDeleteMaterial() {
       qc.invalidateQueries({ queryKey: ['materials'] });
       toast.success('Material eliminado');
     },
-    onError: (err: any) => {
-      toast.error(err?.response?.data?.message ?? 'No se puede eliminar este material');
+    onError: (err: unknown) => {
+      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      toast.error(msg ?? 'No se puede eliminar este material');
     },
   });
 }

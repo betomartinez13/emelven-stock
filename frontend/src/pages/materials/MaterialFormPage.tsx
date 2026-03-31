@@ -61,7 +61,7 @@ export default function MaterialFormPage() {
   const onSubmit = async (data: FormData) => {
     const payload = { ...data, supplierId: data.supplierId || undefined };
     if (isEdit) {
-      const { stockActual, ...rest } = payload;
+      const { stockActual: _stockActual, ...rest } = payload;
       await updateMaterial.mutateAsync({ id: Number(id), data: rest });
     } else {
       await createMaterial.mutateAsync(payload);

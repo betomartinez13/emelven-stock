@@ -40,6 +40,12 @@ export class AuditLogService {
       .leftJoinAndSelect('log.user', 'user')
       .orderBy('log.fecha', 'DESC');
 
+    if (dto.search) {
+      qb.andWhere(
+        '(user.nombre LIKE :search OR user.apellido LIKE :search OR log.entidad LIKE :search)',
+        { search: `%${dto.search}%` },
+      );
+    }
     if (dto.entidad) {
       qb.andWhere('log.entidad = :entidad', { entidad: dto.entidad });
     }

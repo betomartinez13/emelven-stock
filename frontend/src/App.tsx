@@ -31,6 +31,9 @@ import SaleFormPage from './pages/sales/SaleFormPage';
 // Alerts
 import AlertsPage from './pages/alerts/AlertsPage';
 
+// Audit Log
+import AuditLogPage from './pages/audit/AuditLogPage';
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -97,6 +100,9 @@ function App() {
 
               {/* Alerts */}
               <Route path="/alerts" element={<AlertsPage />} />
+
+              {/* Audit Log — no RoleGate here, AuditLogPage guards internally */}
+              <Route path="/audit" element={<AuditLogPage />} />
             </Route>
           </Route>
           <Route path="*" element={<Navigate to="/dashboard" replace />} />

@@ -34,8 +34,9 @@ export function useCreateEntry() {
       qc.invalidateQueries({ queryKey: ['materials'] });
       toast.success('Entrada registrada');
     },
-    onError: (err: any) => {
-      toast.error(err?.response?.data?.message ?? 'Error al registrar entrada');
+    onError: (err: unknown) => {
+      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      toast.error(msg ?? 'Error al registrar entrada');
     },
   });
 }
@@ -49,8 +50,9 @@ export function useCreateExit() {
       qc.invalidateQueries({ queryKey: ['materials'] });
       toast.success('Salida registrada');
     },
-    onError: (err: any) => {
-      toast.error(err?.response?.data?.message ?? 'Error al registrar salida');
+    onError: (err: unknown) => {
+      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      toast.error(msg ?? 'Error al registrar salida');
     },
   });
 }

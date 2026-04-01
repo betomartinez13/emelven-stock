@@ -36,6 +36,9 @@ interface UserFormModalProps {
   user?: User;
 }
 
+const selectClass = 'block w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors';
+const labelClass = 'block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1';
+
 // ---------- component ----------
 
 export default function UserFormModal({ isOpen, onClose, user }: UserFormModalProps) {
@@ -129,11 +132,8 @@ export default function UserFormModal({ isOpen, onClose, user }: UserFormModalPr
           />
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Rol</label>
-            <select
-              {...createForm.register('role')}
-              className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
+            <label className={labelClass}>Rol</label>
+            <select {...createForm.register('role')} className={selectClass}>
               {roleOptions.map(o => (
                 <option key={o.value} value={o.value}>{o.label}</option>
               ))}
@@ -144,10 +144,7 @@ export default function UserFormModal({ isOpen, onClose, user }: UserFormModalPr
             <Button variant="secondary" type="button" onClick={handleClose}>
               Cancelar
             </Button>
-            <Button
-              type="submit"
-              loading={createUser.isPending}
-            >
+            <Button type="submit" loading={createUser.isPending}>
               Crear Usuario
             </Button>
           </div>
@@ -171,11 +168,8 @@ export default function UserFormModal({ isOpen, onClose, user }: UserFormModalPr
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Rol</label>
-            <select
-              {...editForm.register('role')}
-              className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
+            <label className={labelClass}>Rol</label>
+            <select {...editForm.register('role')} className={selectClass}>
               {roleOptions.map(o => (
                 <option key={o.value} value={o.value}>{o.label}</option>
               ))}
@@ -183,15 +177,15 @@ export default function UserFormModal({ isOpen, onClose, user }: UserFormModalPr
           </div>
 
           <div className="flex items-center gap-3">
-            <label className="text-sm font-medium text-gray-700">Estado</label>
+            <label className={labelClass + ' mb-0'}>Estado</label>
             <label className="relative inline-flex items-center cursor-pointer">
               <input
                 type="checkbox"
                 className="sr-only peer"
                 {...editForm.register('isActive')}
               />
-              <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-blue-600 peer-focus:ring-2 peer-focus:ring-blue-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full" />
-              <span className="ml-3 text-sm text-gray-600">
+              <div className="w-11 h-6 bg-slate-200 dark:bg-slate-700 rounded-full peer peer-checked:bg-blue-600 peer-focus:ring-2 peer-focus:ring-blue-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full" />
+              <span className="ml-3 text-sm text-slate-600 dark:text-slate-300">
                 {editForm.watch('isActive') ? 'Activo' : 'Inactivo'}
               </span>
             </label>
@@ -201,10 +195,7 @@ export default function UserFormModal({ isOpen, onClose, user }: UserFormModalPr
             <Button variant="secondary" type="button" onClick={handleClose}>
               Cancelar
             </Button>
-            <Button
-              type="submit"
-              loading={updateUser.isPending}
-            >
+            <Button type="submit" loading={updateUser.isPending}>
               Guardar Cambios
             </Button>
           </div>

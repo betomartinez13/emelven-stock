@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { HiPencil, HiTrash, HiPlus } from 'react-icons/hi';
+import { HiPencil, HiTrash, HiPlus, HiInbox } from 'react-icons/hi';
 import { useCategories, useCreateCategory, useUpdateCategory, useDeleteCategory } from '../../hooks/useCategories';
 import type { Category } from '../../types/category.types';
 import Modal from '../../components/ui/Modal';
@@ -68,8 +68,8 @@ export default function CategoriesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Categorías</h1>
-          <p className="text-sm text-gray-500 mt-1">Categorías de materiales del inventario</p>
+          <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Categorías</h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Categorías de materiales del inventario</p>
         </div>
         <RoleGate roles={['admin']}>
           <Button leftIcon={<HiPlus className="w-4 h-4" />} onClick={openCreate}>
@@ -79,45 +79,48 @@ export default function CategoriesPage() {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
         {isLoading ? (
-          <LoadingSpinner />
+          <div className="py-10"><LoadingSpinner /></div>
         ) : (
-          <table className="min-w-full divide-y divide-gray-200 text-sm">
-            <thead className="bg-gray-50">
+          <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700 text-sm">
+            <thead className="bg-slate-50 dark:bg-slate-700/50">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Nombre</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Descripción</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Nombre</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Descripción</th>
                 <RoleGate roles={['admin']}>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Acciones</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Acciones</th>
                 </RoleGate>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
               {categories?.length === 0 ? (
                 <tr>
-                  <td colSpan={3} className="px-4 py-10 text-center text-gray-400">
-                    No hay categorías registradas
+                  <td colSpan={3} className="px-4 py-12 text-center">
+                    <div className="flex flex-col items-center gap-2">
+                      <HiInbox className="w-8 h-8 text-slate-300 dark:text-slate-600" />
+                      <span className="text-sm text-slate-400 dark:text-slate-500">No hay categorías registradas</span>
+                    </div>
                   </td>
                 </tr>
               ) : (
                 categories?.map(cat => (
-                  <tr key={cat.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-4 py-3 font-medium text-gray-800">{cat.nombre}</td>
-                    <td className="px-4 py-3 text-gray-500">{cat.descripcion ?? '—'}</td>
+                  <tr key={cat.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/40 transition-colors">
+                    <td className="px-4 py-3 font-medium text-slate-800 dark:text-slate-100">{cat.nombre}</td>
+                    <td className="px-4 py-3 text-slate-500 dark:text-slate-400">{cat.descripcion ?? '—'}</td>
                     <RoleGate roles={['admin']}>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => openEdit(cat)}
-                            className="p-1.5 rounded text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
                             title="Editar"
                           >
                             <HiPencil className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => setDeleteTarget(cat)}
-                            className="p-1.5 rounded text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors"
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
                             title="Eliminar"
                           >
                             <HiTrash className="w-4 h-4" />
@@ -170,9 +173,9 @@ export default function CategoriesPage() {
         title="Eliminar Categoría"
         size="sm"
       >
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-slate-600 dark:text-slate-300">
           ¿Estás seguro de que deseas eliminar la categoría{' '}
-          <span className="font-semibold text-gray-800">"{deleteTarget?.nombre}"</span>?
+          <span className="font-semibold text-slate-800 dark:text-slate-100">"{deleteTarget?.nombre}"</span>?
           Esta acción no se puede deshacer.
         </p>
         <div className="flex justify-end gap-3 mt-6">

@@ -26,14 +26,14 @@ export default function Pagination({ page, totalPages, onPageChange }: Paginatio
       <button
         onClick={() => onPageChange(page - 1)}
         disabled={page === 1}
-        className="px-2 py-1 rounded text-sm text-gray-600 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
+        className="px-2 py-1 rounded text-sm text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
       >
         «
       </button>
 
       {pages.map((p, idx) =>
         p === '...' ? (
-          <span key={`ellipsis-${idx}`} className="px-2 py-1 text-sm text-gray-400">
+          <span key={`ellipsis-${idx}`} className="px-2 py-1 text-sm text-slate-400 dark:text-slate-500">
             ...
           </span>
         ) : (
@@ -43,7 +43,7 @@ export default function Pagination({ page, totalPages, onPageChange }: Paginatio
             className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
               p === page
                 ? 'bg-blue-600 text-white'
-                : 'text-gray-600 hover:bg-gray-100'
+                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
             }`}
           >
             {p}
@@ -54,7 +54,7 @@ export default function Pagination({ page, totalPages, onPageChange }: Paginatio
       <button
         onClick={() => onPageChange(page + 1)}
         disabled={page === totalPages}
-        className="px-2 py-1 rounded text-sm text-gray-600 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
+        className="px-2 py-1 rounded text-sm text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
       >
         »
       </button>

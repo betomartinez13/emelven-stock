@@ -47,7 +47,7 @@ export default function UsersListPage() {
       header: 'Nombre',
       accessor: 'nombre',
       render: (_, row) => (
-        <span className="font-medium text-gray-800">
+        <span className="font-medium text-slate-800 dark:text-slate-100">
           {row.nombre} {row.apellido}
         </span>
       ),
@@ -89,7 +89,7 @@ export default function UsersListPage() {
         <div className="flex items-center gap-2">
           <button
             onClick={() => openEdit(row)}
-            className="p-1.5 rounded text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
             title="Editar"
           >
             <HiPencil className="w-4 h-4" />
@@ -97,7 +97,7 @@ export default function UsersListPage() {
           {row.isActive && (
             <button
               onClick={() => setDeactivateTarget(row)}
-              className="p-1.5 rounded text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors"
+              className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
               title="Desactivar"
             >
               <HiTrash className="w-4 h-4" />
@@ -111,8 +111,8 @@ export default function UsersListPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-800">Usuarios</h1>
-        <p className="text-sm text-gray-500 mt-1">Gestión de usuarios del sistema</p>
+        <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Usuarios</h1>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Gestión de usuarios del sistema</p>
       </div>
 
       <DataTable
@@ -146,9 +146,9 @@ export default function UsersListPage() {
         title="Desactivar Usuario"
         size="sm"
       >
-        <p className="text-gray-600 text-sm">
+        <p className="text-slate-600 dark:text-slate-300 text-sm">
           ¿Estás seguro de que deseas desactivar a{' '}
-          <span className="font-semibold text-gray-800">
+          <span className="font-semibold text-slate-800 dark:text-slate-100">
             {deactivateTarget?.nombre} {deactivateTarget?.apellido}
           </span>
           ? El usuario no podrá iniciar sesión.

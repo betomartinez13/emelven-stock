@@ -26,8 +26,8 @@ const ENTITY_OPTIONS: { label: string; value: string }[] = [
 ];
 
 const SELECT_CLASS =
-  'text-sm border border-slate-300 rounded-lg px-4 py-2 font-medium text-slate-700 ' +
-  'bg-white shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500';
+  'text-sm border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2 font-medium text-slate-700 dark:text-slate-200 ' +
+  'bg-white dark:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500';
 
 interface JsonBlockProps {
   label: string;
@@ -40,11 +40,11 @@ function JsonBlock({ label, data, emptyText }: JsonBlockProps) {
     <div className="space-y-2">
       <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{label}</p>
       {data ? (
-        <pre className="bg-slate-50 border border-slate-200 rounded-md p-4 text-sm font-mono text-slate-700 shadow-inner overflow-auto max-h-64 whitespace-pre-wrap break-all leading-relaxed">
+        <pre className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-md p-4 text-sm font-mono text-slate-700 dark:text-slate-300 shadow-inner overflow-auto max-h-64 whitespace-pre-wrap break-all leading-relaxed">
           {JSON.stringify(data, null, 2)}
         </pre>
       ) : (
-        <div className="bg-slate-50 border border-slate-200 rounded-md p-4 text-sm text-slate-400 italic">
+        <div className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-md p-4 text-sm text-slate-400 dark:text-slate-500 italic">
           {emptyText}
         </div>
       )}
@@ -76,20 +76,20 @@ export default function AuditLogPage() {
       accessor: 'fecha',
       header: 'Fecha',
       render: (_, a) => (
-        <span className="text-slate-600 font-medium tabular-nums">{formatDateTime(a.fecha)}</span>
+        <span className="text-slate-600 dark:text-slate-300 font-medium tabular-nums">{formatDateTime(a.fecha)}</span>
       ),
     },
     {
       accessor: 'user',
       header: 'Usuario',
       render: (_, a) => (
-        <span className="font-semibold text-slate-800">{a.user.nombre} {a.user.apellido}</span>
+        <span className="font-semibold text-slate-800 dark:text-slate-100">{a.user.nombre} {a.user.apellido}</span>
       ),
     },
     {
       accessor: 'entidad',
       header: 'Entidad',
-      render: (_, a) => <span className="text-slate-600 font-medium">{a.entidad}</span>,
+      render: (_, a) => <span className="text-slate-600 dark:text-slate-300 font-medium">{a.entidad}</span>,
     },
     {
       accessor: 'accion',
@@ -109,7 +109,7 @@ export default function AuditLogPage() {
       render: (_, a) => (
         <button
           onClick={() => setSelected(a)}
-          className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-slate-100 transition-colors"
+          className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
           title="Ver cambios"
         >
           <HiEye className="w-4 h-4" />
@@ -122,11 +122,11 @@ export default function AuditLogPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">Registro de Auditoría</h1>
+        <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">Registro de Auditoría</h1>
       </div>
 
       {/* Filtros */}
-      <div className="flex flex-wrap gap-3 pb-2 border-b border-slate-200">
+      <div className="flex flex-wrap gap-3 pb-2 border-b border-slate-200 dark:border-slate-700">
         <select
           value={entidad}
           onChange={e => { setEntidad(e.target.value); setPage(1); }}
@@ -180,14 +180,14 @@ export default function AuditLogPage() {
                 { label: 'Usuario',  value: `${selected.user.nombre} ${selected.user.apellido}` },
                 { label: 'Fecha',    value: formatDateTime(selected.fecha) },
               ].map(({ label, value }) => (
-                <div key={label} className="bg-slate-50 rounded-lg px-3 py-2.5 border border-slate-200">
-                  <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-0.5">{label}</p>
-                  <p className="text-sm font-semibold text-slate-800 break-words">{value}</p>
+                <div key={label} className="bg-slate-50 dark:bg-slate-700/50 rounded-lg px-3 py-2.5 border border-slate-200 dark:border-slate-700">
+                  <p className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-0.5">{label}</p>
+                  <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 break-words">{value}</p>
                 </div>
               ))}
             </div>
 
-            <div className="border-t border-slate-100" />
+            <div className="border-t border-slate-100 dark:border-slate-700" />
 
             {/* JSON antes / después */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

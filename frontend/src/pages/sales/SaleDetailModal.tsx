@@ -10,8 +10,8 @@ interface Props {
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div>
-      <p className="text-xs text-slate-400 uppercase font-medium tracking-wide">{label}</p>
-      <p className="text-sm text-slate-800 mt-0.5 break-words">{value}</p>
+      <p className="text-xs text-slate-400 dark:text-slate-500 uppercase font-medium tracking-wide">{label}</p>
+      <p className="text-sm text-slate-800 dark:text-slate-100 mt-0.5 break-words">{value}</p>
     </div>
   );
 }

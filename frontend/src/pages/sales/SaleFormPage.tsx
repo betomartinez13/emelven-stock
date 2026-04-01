@@ -59,47 +59,47 @@ export default function SaleFormPage() {
         onBack={() => navigate('/sales')}
       />
 
-      <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-6">
+      <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm rounded-xl p-6">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Orden de Trabajo (opcional)</label>
-            <select {...register('workOrderId')} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors">
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Orden de Trabajo (opcional)</label>
+            <select {...register('workOrderId')} className="w-full border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors">
               <option value="">Sin orden de trabajo</option>
               {completedWOs?.data.map(wo => (
                 <option key={wo.id} value={wo.id}>{wo.codigo} — {wo.cliente}</option>
               ))}
             </select>
-            <p className="mt-1 text-xs text-slate-400">Al seleccionar una OT se auto-rellenan Cliente y Producto.</p>
+            <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">Al seleccionar una OT se auto-rellenan Cliente y Producto.</p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Cliente *</label>
-            <input {...register('cliente')} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors" />
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Cliente *</label>
+            <input {...register('cliente')} className="w-full border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors" />
             {errors.cliente && <p className="mt-1 text-xs text-red-600">{errors.cliente.message}</p>}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Descripción del producto *</label>
-            <textarea {...register('producto')} rows={2} maxLength={500} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors" />
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Descripción del producto *</label>
+            <textarea {...register('producto')} rows={2} maxLength={500} className="w-full border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors" />
             {errors.producto && <p className="mt-1 text-xs text-red-600">{errors.producto.message}</p>}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Cantidad *</label>
-              <input type="number" {...register('cantidad')} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors" />
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Cantidad *</label>
+              <input type="number" {...register('cantidad')} className="w-full border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors" />
               {errors.cantidad && <p className="mt-1 text-xs text-red-600">{errors.cantidad.message}</p>}
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Fecha de despacho *</label>
-              <input type="date" {...register('fecha')} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors" />
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Fecha de despacho *</label>
+              <input type="date" {...register('fecha')} className="w-full border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors" />
               {errors.fecha && <p className="mt-1 text-xs text-red-600">{errors.fecha.message}</p>}
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Observaciones</label>
-            <textarea {...register('observacion')} rows={2} maxLength={255} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors" />
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Observaciones</label>
+            <textarea {...register('observacion')} rows={2} maxLength={255} className="w-full border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors" />
           </div>
 
           <div className="flex justify-end gap-3 pt-2">

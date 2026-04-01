@@ -27,6 +27,9 @@ type FormData = z.infer<typeof schema>;
 
 const UNITS = ['kg', 'm', 'unidad', 'litro', 'rollo', 'm2', 'par', 'otro'];
 
+const inputClass = 'w-full border border-slate-200 dark:border-slate-600 rounded-lg px-4 py-2.5 text-sm text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors';
+const labelClass = 'block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5';
+
 export default function MaterialFormPage() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
@@ -77,75 +80,68 @@ export default function MaterialFormPage() {
         onBack={() => navigate('/materials')}
       />
 
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 md:p-8">
+      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6 md:p-8">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          {/* Nombre */}
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Nombre *</label>
-            <input {...register('nombre')} maxLength={150} className="w-full border border-slate-300 rounded-lg px-4 py-2.5 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow" />
-            {errors.nombre && <p className="mt-1 text-xs text-red-600">{errors.nombre.message}</p>}
+            <label className={labelClass}>Nombre *</label>
+            <input {...register('nombre')} maxLength={150} className={inputClass} />
+            {errors.nombre && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.nombre.message}</p>}
           </div>
 
-          {/* Descripción */}
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Descripción</label>
-            <textarea {...register('descripcion')} maxLength={500} rows={2} className="w-full border border-slate-300 rounded-lg px-4 py-2.5 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow" />
+            <label className={labelClass}>Descripción</label>
+            <textarea {...register('descripcion')} maxLength={500} rows={2} className={inputClass} />
           </div>
 
-          {/* Unidad */}
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Unidad *</label>
-            <select {...register('unidad')} className="w-full border border-slate-300 rounded-lg px-4 py-2.5 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow bg-white">
+            <label className={labelClass}>Unidad *</label>
+            <select {...register('unidad')} className={inputClass}>
               <option value="">Seleccionar...</option>
               {UNITS.map(u => <option key={u} value={u}>{u}</option>)}
             </select>
-            {errors.unidad && <p className="mt-1 text-xs text-red-600">{errors.unidad.message}</p>}
+            {errors.unidad && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.unidad.message}</p>}
           </div>
 
-          {/* Categoría */}
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Categoría *</label>
-            <select {...register('categoryId')} className="w-full border border-slate-300 rounded-lg px-4 py-2.5 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow bg-white">
+            <label className={labelClass}>Categoría *</label>
+            <select {...register('categoryId')} className={inputClass}>
               <option value="">Seleccionar...</option>
               {categories?.map(c => <option key={c.id} value={c.id}>{c.nombre}</option>)}
             </select>
-            {errors.categoryId && <p className="mt-1 text-xs text-red-600">{errors.categoryId.message}</p>}
+            {errors.categoryId && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.categoryId.message}</p>}
           </div>
 
-          {/* Proveedor */}
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Proveedor (opcional)</label>
-            <select {...register('supplierId')} className="w-full border border-slate-300 rounded-lg px-4 py-2.5 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow bg-white">
+            <label className={labelClass}>Proveedor (opcional)</label>
+            <select {...register('supplierId')} className={inputClass}>
               <option value="">Sin proveedor</option>
               {suppliersData?.data.map(s => <option key={s.id} value={s.id}>{s.nombre}</option>)}
             </select>
-            {errors.supplierId?.message && <p className="mt-1 text-xs text-red-600">{errors.supplierId.message as string}</p>}
+            {errors.supplierId?.message && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.supplierId.message as string}</p>}
           </div>
 
-          {/* Stock min/max */}
           <div className="grid grid-cols-2 gap-5">
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1.5">Stock Mínimo *</label>
-              <input type="number" step="any" {...register('stockMin')} className="w-full border border-slate-300 rounded-lg px-4 py-2.5 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow" />
-              {errors.stockMin && <p className="mt-1 text-xs text-red-600">{errors.stockMin.message}</p>}
+              <label className={labelClass}>Stock Mínimo *</label>
+              <input type="number" step="any" {...register('stockMin')} className={inputClass} />
+              {errors.stockMin && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.stockMin.message}</p>}
             </div>
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1.5">Stock Máximo *</label>
-              <input type="number" step="any" {...register('stockMax')} className="w-full border border-slate-300 rounded-lg px-4 py-2.5 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow" />
-              {errors.stockMax && <p className="mt-1 text-xs text-red-600">{errors.stockMax.message}</p>}
+              <label className={labelClass}>Stock Máximo *</label>
+              <input type="number" step="any" {...register('stockMax')} className={inputClass} />
+              {errors.stockMax && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.stockMax.message}</p>}
             </div>
           </div>
 
-          {/* Stock actual — solo al crear */}
           {!isEdit && (
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1.5">Stock Inicial</label>
-              <input type="number" step="any" {...register('stockActual')} defaultValue={0} className="w-full border border-slate-300 rounded-lg px-4 py-2.5 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow" />
-              <p className="mt-1.5 text-xs text-slate-500 font-medium">En edición el stock solo se modifica via entradas/salidas.</p>
+              <label className={labelClass}>Stock Inicial</label>
+              <input type="number" step="any" {...register('stockActual')} defaultValue={0} className={inputClass} />
+              <p className="mt-1.5 text-xs text-slate-500 dark:text-slate-400 font-medium">En edición el stock solo se modifica via entradas/salidas.</p>
             </div>
           )}
 
-          <div className="flex justify-end gap-3 pt-4 mt-2 border-t border-slate-100">
+          <div className="flex justify-end gap-3 pt-4 mt-2 border-t border-slate-100 dark:border-slate-700">
             <Button type="button" variant="secondary" onClick={() => navigate('/materials')}>Cancelar</Button>
             <Button type="submit" loading={isSubmitting}>
               {isEdit ? 'Guardar cambios' : 'Crear material'}

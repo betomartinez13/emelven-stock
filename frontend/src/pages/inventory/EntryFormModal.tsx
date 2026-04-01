@@ -15,8 +15,8 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
-const fieldClass = 'w-full border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors';
-const labelClass = 'block text-sm font-medium text-slate-700 mb-1';
+const fieldClass = 'w-full border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors';
+const labelClass = 'block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1';
 const errorClass = 'mt-1 text-xs text-red-500';
 
 interface EntryFormModalProps {

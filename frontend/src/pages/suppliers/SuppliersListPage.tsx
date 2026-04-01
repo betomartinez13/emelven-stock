@@ -33,7 +33,7 @@ export default function SuppliersListPage() {
     {
       header: 'Nombre',
       accessor: 'nombre',
-      render: (_, row) => <span className="font-medium text-gray-800 block max-w-[180px] truncate" title={row.nombre}>{row.nombre}</span>,
+      render: (_, row) => <span className="font-medium text-slate-800 dark:text-slate-100 block max-w-[180px] truncate" title={row.nombre}>{row.nombre}</span>,
     },
     { header: 'Contacto',  accessor: 'contacto',  render: (_, row) => <span className="block max-w-[120px] truncate" title={row.contacto ?? ''}>{row.contacto ?? '—'}</span> },
     { header: 'Teléfono',  accessor: 'telefono',  render: (_, row) => <span className="block max-w-[130px] truncate" title={row.telefono ?? ''}>{row.telefono ?? '—'}</span> },
@@ -46,7 +46,7 @@ export default function SuppliersListPage() {
         <div className="flex items-center gap-2">
           <button
             onClick={() => navigate(`/suppliers/${row.id}/edit`)}
-            className="p-1.5 rounded text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
             title="Editar"
           >
             <HiPencil className="w-4 h-4" />
@@ -54,7 +54,7 @@ export default function SuppliersListPage() {
           <RoleGate roles={['admin']}>
             <button
               onClick={() => setDeleteTarget(row)}
-              className="p-1.5 rounded text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors"
+              className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
               title="Eliminar"
             >
               <HiTrash className="w-4 h-4" />
@@ -68,8 +68,8 @@ export default function SuppliersListPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-800">Proveedores</h1>
-        <p className="text-sm text-gray-500 mt-1">Gestión de proveedores del inventario</p>
+        <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Proveedores</h1>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Gestión de proveedores del inventario</p>
       </div>
 
       <DataTable
@@ -99,9 +99,9 @@ export default function SuppliersListPage() {
         title="Eliminar Proveedor"
         size="sm"
       >
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-slate-600 dark:text-slate-300">
           ¿Estás seguro de que deseas eliminar al proveedor{' '}
-          <span className="font-semibold text-gray-800">"{deleteTarget?.nombre}"</span>?
+          <span className="font-semibold text-slate-800 dark:text-slate-100">"{deleteTarget?.nombre}"</span>?
           Esta acción no se puede deshacer.
         </p>
         <div className="flex justify-end gap-3 mt-6">

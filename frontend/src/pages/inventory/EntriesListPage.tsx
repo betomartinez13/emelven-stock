@@ -22,7 +22,7 @@ export default function EntriesListPage() {
     {
       accessor: 'material',
       header: 'Material',
-      render: (_, e) => <span className="font-medium text-slate-800">{e.material.nombre}</span>,
+      render: (_, e) => <span className="font-medium text-slate-800 dark:text-slate-100">{e.material.nombre}</span>,
     },
     {
       accessor: 'cantidad',
@@ -42,7 +42,7 @@ export default function EntriesListPage() {
       render: (_, e) => (
         <button
           onClick={() => setSelectedEntry(e)}
-          className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-slate-100 transition-colors"
+          className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
           title="Ver detalles"
         >
           <HiEye className="w-4 h-4" />
@@ -54,7 +54,7 @@ export default function EntriesListPage() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-slate-800">Entradas de Inventario</h1>
+        <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Entradas de Inventario</h1>
         <RoleGate roles={['admin', 'warehouse']}>
           <Button leftIcon={<HiPlus className="w-4 h-4" />} onClick={() => setShowModal(true)}>
             Nueva Entrada

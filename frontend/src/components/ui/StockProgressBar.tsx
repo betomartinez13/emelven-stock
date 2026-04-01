@@ -23,10 +23,10 @@ export default function StockProgressBar({ stockActual, stockMin, stockMax }: St
   return (
     <div className="w-full max-w-[140px]">
       <div className="flex justify-between text-xs font-bold mb-1.5 tabular-nums">
-        <span className="text-slate-800">{stockActual}</span>
-        <span className="text-slate-400">/ {stockMax > 0 ? stockMax : '—'}</span>
+        <span className="text-slate-800 dark:text-slate-100">{stockActual}</span>
+        <span className="text-slate-400 dark:text-slate-500">/ {stockMax > 0 ? stockMax : '—'}</span>
       </div>
-      <div className="relative h-2 bg-slate-100 rounded-full overflow-hidden border border-slate-200 inner-shadow-sm">
+      <div className="relative h-2 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden border border-slate-200 dark:border-slate-600 inner-shadow-sm">
         {/* Min marker */}
         {minPct > 0 && (
           <div

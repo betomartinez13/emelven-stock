@@ -46,13 +46,13 @@ export default function DataTable<T extends object>({
       <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
         {onSearch && (
           <div className="relative w-full sm:w-72">
-            <HiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <HiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 w-4 h-4" />
             <input
               type="text"
               value={searchValue}
               onChange={handleSearch}
               placeholder={searchPlaceholder}
-              className="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full pl-9 pr-3 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
             />
           </div>
         )}
@@ -68,7 +68,7 @@ export default function DataTable<T extends object>({
       />
 
       {/* Footer: count + pagination */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-gray-500">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-slate-500 dark:text-slate-400">
         <span>
           {total > 0
             ? `${(page - 1) * PAGE_SIZE + 1}–${Math.min(page * PAGE_SIZE, total)} de ${total} registros`

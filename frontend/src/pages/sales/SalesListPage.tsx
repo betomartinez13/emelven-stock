@@ -31,7 +31,7 @@ export default function SalesListPage() {
       render: (_, s) => (
         <button
           onClick={() => setSelectedSale(s)}
-          className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-slate-100 transition-colors"
+          className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
           title="Ver detalles"
         >
           <HiEye className="w-4 h-4" />
@@ -43,7 +43,7 @@ export default function SalesListPage() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-slate-800">Ventas</h1>
+        <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Ventas</h1>
         <RoleGate roles={['admin', 'warehouse']}>
           <Button leftIcon={<HiPlus className="w-4 h-4" />} onClick={() => navigate('/sales/new')}>
             Nueva Venta

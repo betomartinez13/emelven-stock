@@ -74,7 +74,7 @@ export default function WorkOrdersListPage() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-slate-800">Órdenes de Trabajo</h1>
+        <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Órdenes de Trabajo</h1>
         <RoleGate roles={['admin', 'warehouse']}>
           <Button leftIcon={<HiPlus className="w-4 h-4" />} onClick={() => navigate('/work-orders/new')}>
             Nueva Orden
@@ -83,7 +83,7 @@ export default function WorkOrdersListPage() {
       </div>
 
       {/* Status tabs */}
-      <div className="flex gap-1 flex-wrap border-b border-slate-200">
+      <div className="flex gap-1 flex-wrap border-b border-slate-200 dark:border-slate-700">
         {STATUS_TABS.map(tab => (
           <button
             key={tab.value}
@@ -91,7 +91,7 @@ export default function WorkOrdersListPage() {
             className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px ${
               statusFilter === tab.value
                 ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-slate-500 hover:text-slate-700'
+                : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
             }`}
           >
             {tab.label}

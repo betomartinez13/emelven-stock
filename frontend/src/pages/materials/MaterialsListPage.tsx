@@ -26,10 +26,10 @@ export default function MaterialsListPage() {
   const deleteMaterial = useDeleteMaterial();
 
   const columns: Column<Material>[] = [
-    { accessor: 'nombre', header: 'Nombre', render: (_, m) => <span className="font-bold text-slate-800 tracking-tight">{m.nombre}</span> },
-    { accessor: 'category', header: 'Categoría', render: (_, m) => <span className="text-slate-600 font-medium">{m.category?.nombre ?? '—'}</span> },
-    { accessor: 'supplier', header: 'Proveedor', render: (_, m) => <span className="text-slate-600 font-medium">{m.supplier?.nombre ?? '—'}</span> },
-    { accessor: 'unidad', header: 'Unidad', render: (_, m) => <span className="text-slate-600 font-medium">{m.unidad}</span> },
+    { accessor: 'nombre', header: 'Nombre', render: (_, m) => <span className="font-bold text-slate-800 dark:text-slate-100 tracking-tight">{m.nombre}</span> },
+    { accessor: 'category', header: 'Categoría', render: (_, m) => <span className="text-slate-600 dark:text-slate-300 font-medium">{m.category?.nombre ?? '—'}</span> },
+    { accessor: 'supplier', header: 'Proveedor', render: (_, m) => <span className="text-slate-600 dark:text-slate-300 font-medium">{m.supplier?.nombre ?? '—'}</span> },
+    { accessor: 'unidad', header: 'Unidad', render: (_, m) => <span className="text-slate-600 dark:text-slate-300 font-medium">{m.unidad}</span> },
     {
       accessor: 'stock',
       header: 'Stock',
@@ -51,7 +51,7 @@ export default function MaterialsListPage() {
         <div className="flex items-center gap-1.5">
           <button
             onClick={() => setHistoryMaterial(m)}
-            className="p-1.5 rounded-md text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+            className="p-1.5 rounded-md text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
             title="Ver movimientos"
           >
             <HiEye className="w-4 h-4" />
@@ -59,7 +59,7 @@ export default function MaterialsListPage() {
           <RoleGate roles={['admin', 'warehouse']}>
             <button
               onClick={() => navigate(`/materials/${m.id}/edit`)}
-              className="p-1.5 rounded-md text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors"
+              className="p-1.5 rounded-md text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors"
               title="Editar"
             >
               <HiPencil className="w-4 h-4" />
@@ -68,7 +68,7 @@ export default function MaterialsListPage() {
           <RoleGate roles={['admin']}>
             <button
               onClick={() => setDeleteTarget(m)}
-              className="p-1.5 rounded-md text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+              className="p-1.5 rounded-md text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
               title="Eliminar"
             >
               <HiTrash className="w-4 h-4" />
@@ -88,7 +88,7 @@ export default function MaterialsListPage() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">Materiales</h1>
+        <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">Materiales</h1>
         <div className="flex flex-wrap gap-3">
           <RoleGate roles={['admin', 'manager']}>
             <Button
@@ -112,11 +112,11 @@ export default function MaterialsListPage() {
       </div>
 
       {/* Filtros */}
-      <div className="flex flex-wrap gap-3 pb-2 border-b border-slate-200">
+      <div className="flex flex-wrap gap-3 pb-2 border-b border-slate-200 dark:border-slate-700">
         <select
           value={categoryId ?? ''}
           onChange={e => { setCategoryId(e.target.value ? Number(e.target.value) : undefined); setPage(1); }}
-          className="text-sm border border-slate-300 rounded-lg px-4 py-2 font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm transition-all"
+          className="text-sm border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2 font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
         >
           <option value="">Todas las categorías</option>
           {categories?.map(c => <option key={c.id} value={c.id}>{c.nombre}</option>)}
@@ -142,8 +142,8 @@ export default function MaterialsListPage() {
         title="Confirmar eliminación"
         size="sm"
       >
-        <p className="text-slate-600 mb-6 font-medium">
-          ¿Eliminar el material <strong className="text-slate-800">{deleteTarget?.nombre}</strong>? Esta acción no se puede deshacer.
+        <p className="text-slate-600 dark:text-slate-300 mb-6 font-medium">
+          ¿Eliminar el material <strong className="text-slate-800 dark:text-slate-100">{deleteTarget?.nombre}</strong>? Esta acción no se puede deshacer.
         </p>
         <div className="flex justify-end gap-3">
           <Button variant="secondary" onClick={() => setDeleteTarget(null)}>Cancelar</Button>

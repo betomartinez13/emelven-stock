@@ -14,7 +14,7 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
-const INPUT_CLASS = 'w-full border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors';
+const INPUT_CLASS = 'w-full border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors';
 
 export default function WorkOrderFormPage() {
   const navigate = useNavigate();
@@ -38,10 +38,10 @@ export default function WorkOrderFormPage() {
         onBack={() => navigate('/work-orders')}
       />
 
-      <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-6">
+      <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm rounded-xl p-6">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Descripción del trabajo *</label>
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Descripción del trabajo *</label>
             <textarea
               {...register('descripcion')}
               rows={3}
@@ -53,7 +53,7 @@ export default function WorkOrderFormPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Cliente *</label>
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Cliente *</label>
             <input
               {...register('cliente')}
               maxLength={150}
@@ -63,7 +63,7 @@ export default function WorkOrderFormPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Fecha de inicio *</label>
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Fecha de inicio *</label>
             <input
               type="date"
               {...register('fechaInicio')}

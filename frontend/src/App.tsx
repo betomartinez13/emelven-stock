@@ -34,6 +34,11 @@ import AlertsPage from './pages/alerts/AlertsPage';
 // Audit Log
 import AuditLogPage from './pages/audit/AuditLogPage';
 
+// Reports
+import KpiDashboardPage from './pages/reports/KpiDashboardPage';
+import MonthlyConsumptionPage from './pages/reports/MonthlyConsumptionPage';
+import ProjectConsumptionPage from './pages/reports/ProjectConsumptionPage';
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -103,6 +108,33 @@ function App() {
 
               {/* Audit Log — no RoleGate here, AuditLogPage guards internally */}
               <Route path="/audit" element={<AuditLogPage />} />
+
+              {/* Reports — admin and manager only */}
+              <Route path="/reports" element={<Navigate to="/reports/kpi" replace />} />
+              <Route
+                path="/reports/kpi"
+                element={
+                  <RoleGate roles={['admin', 'manager']} fallback={<Navigate to="/dashboard" replace />}>
+                    <KpiDashboardPage />
+                  </RoleGate>
+                }
+              />
+              <Route
+                path="/reports/monthly"
+                element={
+                  <RoleGate roles={['admin', 'manager']} fallback={<Navigate to="/dashboard" replace />}>
+                    <MonthlyConsumptionPage />
+                  </RoleGate>
+                }
+              />
+              <Route
+                path="/reports/project"
+                element={
+                  <RoleGate roles={['admin', 'manager']} fallback={<Navigate to="/dashboard" replace />}>
+                    <ProjectConsumptionPage />
+                  </RoleGate>
+                }
+              />
             </Route>
           </Route>
           <Route path="*" element={<Navigate to="/dashboard" replace />} />

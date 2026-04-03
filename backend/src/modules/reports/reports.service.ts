@@ -134,27 +134,27 @@ export class ReportsService {
       this.materialsRepo.count(),
       this.materialsRepo.count({ where: { stockActual: 0 } }),
       this.dataSource.query(
-        `SELECT COUNT(*) as entradasDelMes FROM inventory_entries WHERE YEAR(fechaEntrada)=? AND MONTH(fechaEntrada)=?`,
+        `SELECT COUNT(*) as entradasDelMes FROM inventory_entries WHERE YEAR(DATE_SUB(createdAt, INTERVAL 4 HOUR))=? AND MONTH(DATE_SUB(createdAt, INTERVAL 4 HOUR))=?`,
         [year, month],
       ),
       this.dataSource.query(
-        `SELECT COUNT(*) as salidasDelMes FROM inventory_exits WHERE YEAR(fechaSalida)=? AND MONTH(fechaSalida)=?`,
+        `SELECT COUNT(*) as salidasDelMes FROM inventory_exits WHERE YEAR(DATE_SUB(createdAt, INTERVAL 4 HOUR))=? AND MONTH(DATE_SUB(createdAt, INTERVAL 4 HOUR))=?`,
         [year, month],
       ),
       this.workOrdersRepo.count({ where: { estado: WorkOrderStatus.IN_PROGRESS } }),
       this.workOrdersRepo.count({
         where: {
           estado: WorkOrderStatus.COMPLETED,
-          fechaFin: Raw((a) => `YEAR(${a})=${year} AND MONTH(${a})=${month}`),
+          updatedAt: Raw((a) => `YEAR(DATE_SUB(${a}, INTERVAL 4 HOUR))=${year} AND MONTH(DATE_SUB(${a}, INTERVAL 4 HOUR))=${month}`),
         },
       }),
       this.salesRepo.count({
-        where: { fecha: Raw((a) => `YEAR(${a})=${year} AND MONTH(${a})=${month}`) },
+        where: { createdAt: Raw((a) => `YEAR(DATE_SUB(${a}, INTERVAL 4 HOUR))=${year} AND MONTH(DATE_SUB(${a}, INTERVAL 4 HOUR))=${month}`) },
       }),
       this.dataSource.query(
         `SELECT m.nombre, m.unidad, SUM(e.cantidad) AS total
         FROM inventory_exits e JOIN materials m ON e.materialId = m.id
-        WHERE YEAR(e.fechaSalida)=? AND MONTH(e.fechaSalida)=?
+        WHERE YEAR(DATE_SUB(e.createdAt, INTERVAL 4 HOUR))=? AND MONTH(DATE_SUB(e.createdAt, INTERVAL 4 HOUR))=?
         GROUP BY m.id ORDER BY total DESC LIMIT 1`,
         [year, month],
       ),

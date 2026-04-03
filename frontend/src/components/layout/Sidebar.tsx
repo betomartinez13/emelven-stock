@@ -34,7 +34,9 @@ const navItems: NavItem[] = [
   { path: '/work-orders',        label: 'Órdenes de Trabajo', icon: HiClipboardList, roles: ['admin', 'warehouse', 'manager'] },
   { path: '/sales',              label: 'Ventas',             icon: HiShoppingBag,   roles: ['admin', 'warehouse', 'manager'] },
   { path: '/alerts',             label: 'Alertas',            icon: HiBell,          roles: ['admin', 'warehouse', 'manager'] },
-  { path: '/reports',            label: 'Reportes',           icon: HiChartBar,      roles: ['admin', 'manager'] },
+  { path: '/reports/kpi',         label: 'KPI Dashboard',      icon: HiChartBar,      roles: ['admin', 'manager'] },
+  { path: '/reports/monthly',     label: 'Consumo Mensual',    icon: HiChartBar,      roles: ['admin', 'manager'] },
+  { path: '/reports/project',    label: 'Por Proyecto',       icon: HiChartBar,      roles: ['admin', 'manager'] },
   { path: '/audit',              label: 'Auditoría',          icon: HiShieldCheck,   roles: ['admin'] },
   { path: '/users',              label: 'Usuarios',           icon: HiUsers,         roles: ['admin'] },
 ];

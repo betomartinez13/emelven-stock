@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { HiArrowLeft } from 'react-icons/hi';
-import { useWorkOrder, useUpdateWorkOrderStatus } from '../../hooks/useWorkOrders';
+import { HiArrowLeft, HiPencil, HiCheck, HiX } from 'react-icons/hi';
+import { useWorkOrder, useUpdateWorkOrderStatus, useUpdateWorkOrder } from '../../hooks/useWorkOrders';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import Button from '../../components/ui/Button';
 import RoleGate from '../../components/shared/RoleGate';
@@ -13,9 +13,26 @@ export default function WorkOrderDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [showAddMaterial, setShowAddMaterial] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [editDescripcion, setEditDescripcion] = useState('');
+  const [editCliente, setEditCliente] = useState('');
 
   const { data: wo, isLoading } = useWorkOrder(id ? Number(id) : null);
   const updateStatus = useUpdateWorkOrderStatus();
+  const updateWorkOrder = useUpdateWorkOrder();
+
+  const handleEditOpen = () => {
+    setEditDescripcion(wo!.descripcion);
+    setEditCliente(wo!.cliente);
+    setEditing(true);
+  };
+
+  const handleEditSave = () => {
+    updateWorkOrder.mutate(
+      { id: wo!.id, data: { descripcion: editDescripcion, cliente: editCliente } },
+      { onSuccess: () => setEditing(false) },
+    );
+  };
 
   if (isLoading) return <div className="flex justify-center py-20"><LoadingSpinner /></div>;
   if (!wo) return <p className="text-center text-slate-500 dark:text-slate-400 py-10">Orden no encontrada</p>;
@@ -74,25 +91,79 @@ export default function WorkOrderDetailPage() {
       </div>
 
       {/* Info card */}
-      <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm rounded-xl p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <p className="text-xs text-slate-400 dark:text-slate-500 uppercase font-medium tracking-wide">Cliente</p>
-          <p className="text-sm text-slate-800 dark:text-slate-100 font-medium mt-0.5">{wo.cliente}</p>
+      <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm rounded-xl p-6 space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wide">Información general</h2>
+          {!editing && (wo.estado === 'pendiente' || wo.estado === 'en_progreso') && (
+            <RoleGate roles={['admin', 'warehouse']}>
+              <button
+                onClick={handleEditOpen}
+                className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+              >
+                <HiPencil className="w-3.5 h-3.5" />
+                Editar
+              </button>
+            </RoleGate>
+          )}
         </div>
-        <div>
-          <p className="text-xs text-slate-400 dark:text-slate-500 uppercase font-medium tracking-wide">Fecha de inicio</p>
-          <p className="text-sm text-slate-800 dark:text-slate-100 mt-0.5">{formatDateShort(wo.fechaInicio)}</p>
-        </div>
-        {wo.fechaFin && (
-          <div>
-            <p className="text-xs text-slate-400 dark:text-slate-500 uppercase font-medium tracking-wide">Fecha de fin</p>
-            <p className="text-sm text-slate-800 dark:text-slate-100 mt-0.5">{formatDateShort(wo.fechaFin)}</p>
+
+        {editing ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="text-xs text-slate-400 dark:text-slate-500 uppercase font-medium tracking-wide">Cliente</label>
+              <input
+                className="mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 text-sm px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={editCliente}
+                onChange={e => setEditCliente(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="text-xs text-slate-400 dark:text-slate-500 uppercase font-medium tracking-wide">Fecha de inicio</label>
+              <p className="text-sm text-slate-800 dark:text-slate-100 mt-1.5">{formatDateShort(wo.fechaInicio)}</p>
+            </div>
+            <div className="sm:col-span-2">
+              <label className="text-xs text-slate-400 dark:text-slate-500 uppercase font-medium tracking-wide">Descripción</label>
+              <textarea
+                rows={2}
+                className="mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 text-sm px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                value={editDescripcion}
+                onChange={e => setEditDescripcion(e.target.value)}
+              />
+            </div>
+            <div className="sm:col-span-2 flex justify-end gap-2">
+              <button
+                onClick={() => setEditing(false)}
+                className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
+              >
+                <HiX className="w-4 h-4" /> Cancelar
+              </button>
+              <Button size="sm" loading={updateWorkOrder.isPending} onClick={handleEditSave}>
+                <HiCheck className="w-4 h-4 mr-1" /> Guardar
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <p className="text-xs text-slate-400 dark:text-slate-500 uppercase font-medium tracking-wide">Cliente</p>
+              <p className="text-sm text-slate-800 dark:text-slate-100 font-medium mt-0.5">{wo.cliente}</p>
+            </div>
+            <div>
+              <p className="text-xs text-slate-400 dark:text-slate-500 uppercase font-medium tracking-wide">Fecha de inicio</p>
+              <p className="text-sm text-slate-800 dark:text-slate-100 mt-0.5">{formatDateShort(wo.fechaInicio)}</p>
+            </div>
+            {wo.fechaFin && (
+              <div>
+                <p className="text-xs text-slate-400 dark:text-slate-500 uppercase font-medium tracking-wide">Fecha de fin</p>
+                <p className="text-sm text-slate-800 dark:text-slate-100 mt-0.5">{formatDateShort(wo.fechaFin)}</p>
+              </div>
+            )}
+            <div className="sm:col-span-2">
+              <p className="text-xs text-slate-400 dark:text-slate-500 uppercase font-medium tracking-wide">Descripción</p>
+              <p className="text-sm text-slate-800 dark:text-slate-100 mt-0.5">{wo.descripcion}</p>
+            </div>
           </div>
         )}
-        <div className="sm:col-span-2">
-          <p className="text-xs text-slate-400 dark:text-slate-500 uppercase font-medium tracking-wide">Descripción</p>
-          <p className="text-sm text-slate-800 dark:text-slate-100 mt-0.5">{wo.descripcion}</p>
-        </div>
       </div>
 
       {/* Materials */}

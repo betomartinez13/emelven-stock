@@ -44,3 +44,8 @@ export interface AddMaterialData {
   materialId: number;
   cantidadUsada: number;
 }
+
+export interface UpdateWorkOrderData {
+  descripcion?: string;
+  cliente?: string;
+}

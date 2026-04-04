@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import type { AxiosError } from 'axios';
 import { workOrdersApi } from '../api/work-orders.api';
-import type { WorkOrderFilterParams, CreateWorkOrderData, WorkOrderStatus, AddMaterialData } from '../types/work-order.types';
+import type { WorkOrderFilterParams, CreateWorkOrderData, UpdateWorkOrderData, WorkOrderStatus, AddMaterialData } from '../types/work-order.types';
 
 type ApiError = AxiosError<{ message?: string }>;
 
@@ -31,6 +31,22 @@ export function useCreateWorkOrder() {
     },
     onError: (err: ApiError) => {
       toast.error(err.response?.data?.message ?? 'Error al crear orden de trabajo');
+    },
+  });
+}
+
+export function useUpdateWorkOrder() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: number; data: UpdateWorkOrderData }) =>
+      workOrdersApi.update(id, data),
+    onSuccess: (_, { id }) => {
+      qc.invalidateQueries({ queryKey: ['work-orders', id] });
+      qc.invalidateQueries({ queryKey: ['work-orders'] });
+      toast.success('Orden de trabajo actualizada');
+    },
+    onError: (err: ApiError) => {
+      toast.error(err.response?.data?.message ?? 'Error al actualizar orden de trabajo');
     },
   });
 }

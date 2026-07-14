@@ -115,7 +115,7 @@ emelven-stock/
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/your-username/emelven-stock.git
+git clone https://github.com/betomartinez13/emelven-stock.git
 cd emelven-stock
 ```
 
@@ -131,6 +131,7 @@ docker-compose up -d
 cd backend
 cp .env.example .env   # fill in your environment variables
 npm install
+npm run seed           # creates admin user and default categories
 npm run start:dev
 ```
 - API running on `http://localhost:3000`
@@ -155,9 +156,9 @@ DB_HOST=localhost
 DB_PORT=3306
 DB_USERNAME=root
 DB_PASSWORD=root
-DB_NAME=emelven_db
+DB_DATABASE=emelven_db
 JWT_SECRET=your_secret_key
-JWT_EXPIRES_IN=7d
+JWT_EXPIRATION=24h
 ```
 
 ---
@@ -184,7 +185,11 @@ npm run test
 
 ### Stress tests
 ```bash
-k6 run tests/stress/stock.js
+cd backend
+k6 run k6/01-login-stress.js
+k6 run k6/02-inventory-read-stress.js
+k6 run k6/03-write-stress.js
+k6 run k6/04-reports-stress.js
 ```
 
 ---
